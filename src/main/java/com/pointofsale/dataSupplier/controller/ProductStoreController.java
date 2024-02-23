@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.print.attribute.standard.Media;
 
 @RestController
-@RequestMapping(path = "/api/v1/product-store")
+@RequestMapping(path = "/api/v1/products-store")
 @RequiredArgsConstructor
 public class ProductStoreController {
 
@@ -45,7 +45,7 @@ public class ProductStoreController {
     @GetMapping(
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> getAllProductStore(@RequestParam(value = "productCode", required = false) String productCode,
+    public ResponseEntity<?> getAllProductStores(@RequestParam(value = "productCode", required = false) String productCode,
                                     @RequestParam(value = "productName", required = false) String productName,
                                     @RequestParam(value = "purchasePrice", required = false) Integer purchasePrice,
                                     @RequestParam(value = "minSellingPrice", required = false) Integer minSellingPrice,
