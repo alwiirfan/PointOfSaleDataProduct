@@ -1,10 +1,7 @@
 package com.pointofsale.dataSupplier.entity;
 
 import com.pointofsale.dataSupplier.constant.ECategory;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
@@ -12,9 +9,10 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "category_product")
+@Table(name = "categories")
 @Builder(toBuilder = true)
 public class Category extends BaseEntity {
     @Enumerated(EnumType.STRING)
-    private ECategory eCategory;
+    @Column(name = "category_type")
+    private ECategory category;
 }

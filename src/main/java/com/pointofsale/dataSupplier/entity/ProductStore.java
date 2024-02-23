@@ -14,7 +14,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 public class ProductStore extends BaseEntity {
 
-    @Column(name = "product_code", unique = true)
+    @Column(name = "product_code", length = 6 ,unique = true)
     private String productCode;
 
     @Column(name = "product_name", length = 300, nullable = false)

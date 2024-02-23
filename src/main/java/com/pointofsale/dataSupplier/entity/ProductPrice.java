@@ -14,10 +14,10 @@ import java.math.BigDecimal;
 @Table(name = "product_price")
 @Builder(toBuilder = true)
 public class ProductPrice extends BaseEntity {
-    @Column( name = "purchase_price", columnDefinition = "bigDecimal check (purchasePrice > 0)")
+    @Column( name = "purchase_price", columnDefinition = "decimal(19,2) check (purchase_price > 0) not null")
     private BigDecimal purchasePrice;
 
-    @Column(name = "selling_price", columnDefinition = "bigDecimal check (sellingPrice > 0)")
+    @Column(name = "selling_price", columnDefinition = "decimal(19,2) check (selling_price > 0) not null")
     private BigDecimal sellingPrice;
 
     @Column(columnDefinition = "int check (stock > 0)")
