@@ -15,7 +15,6 @@ import com.pointofsale.dataSupplier.service.ProductPriceService;
 import com.pointofsale.dataSupplier.service.ProductStoreService;
 import com.pointofsale.dataSupplier.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductStoreServiceImpl implements ProductStoreService {

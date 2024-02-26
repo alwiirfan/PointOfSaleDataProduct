@@ -7,7 +7,6 @@ import com.pointofsale.dataSupplier.dto.response.CommonResponse;
 import com.pointofsale.dataSupplier.dto.response.PaginationResponse;
 import com.pointofsale.dataSupplier.dto.response.ProductStoreResponse;
 import com.pointofsale.dataSupplier.service.ProductStoreService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -15,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.print.attribute.standard.Media;
 
 @RestController
 @RequestMapping(path = "/api/v1/products-store")

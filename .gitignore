@@ -34,3 +34,6 @@ build/
 
 script.sh
 postman.http
+
+### environment variable
+.env
