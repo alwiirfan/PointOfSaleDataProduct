@@ -15,6 +15,8 @@ import com.pointofsale.dataSupplier.service.ProductPriceService;
 import com.pointofsale.dataSupplier.service.ProductStoreService;
 import com.pointofsale.dataSupplier.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
+
+import java.util.*;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -95,7 +97,14 @@ public class ProductStoreServiceImpl implements ProductStoreService {
         ProductStore productStore = productStoreRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ResponseMessage.getNotFoundResource(ProductStore.class)));
 
-        return toProductStoreResponse(productStore, productStore.getProductPrices().get(0));
+        List<ProductPrice> productPrices = productStore.getProductPrices();
+
+        if (productPrices != null && !productPrices.isEmpty()) {
+        return toProductStoreResponse(productStore, productPrices.get(0));
+        } else {
+            
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ResponseMessage.getInternalServerError(ProductPrice.class));
+        }
     }
 
     private ProductStore findByIdOrThrowNotFound(String id) {
@@ -111,13 +120,17 @@ public class ProductStoreServiceImpl implements ProductStoreService {
 
         String productCategoryString = request.getProductCategory();
         if (productCategoryString.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ResponseMessage.getBadRequest(ProductStore.class));
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ResponseMessage.getBadRequest(Category.class));
         }
 
         ECategory eCategory = ECategory.getCategory(productCategoryString);
         Category category = categoryService.getOrSave(eCategory);
 
         ProductStore productStore = productPrice.getProductStore();
+        if (productStore == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ResponseMessage.getNotFoundResource(ProductStore.class));
+        }
+        
         productStore.setProductName(request.getProductName());
         productStore.setCategory(category);
         productStore.setDescription(request.getDescription());
