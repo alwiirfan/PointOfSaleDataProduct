@@ -7,6 +7,15 @@ import com.pointofsale.dataSupplier.dto.response.CommonResponse;
 import com.pointofsale.dataSupplier.dto.response.PaginationResponse;
 import com.pointofsale.dataSupplier.dto.response.ProductStoreResponse;
 import com.pointofsale.dataSupplier.service.ProductStoreService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -22,6 +31,12 @@ public class ProductStoreController {
 
     private final ProductStoreService productStoreService;
 
+    @Tag(name = "Create product store", description = "POST methods of Product Store APIs")
+    @Operation(summary = "Create product store", description = "Create Product into the store")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Successfully create product into the store", 
+                content = @Content(schema = @Schema(implementation = CommonResponse.class))),
+    })
     @PostMapping(
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -40,6 +55,12 @@ public class ProductStoreController {
                 .body(response);
     }
 
+    @Tag(name = "Get products store", description = "GET methods of Product Store APIs")
+    @Operation(summary = "Get all products store", description = "Get all products store")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Get all products in store successfully", 
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CommonResponse.class)) }),
+    })
     @GetMapping(
             produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -76,11 +97,19 @@ public class ProductStoreController {
         return ResponseEntity.ok(response);
     }
 
+    @Tag(name = "Get product store", description = "GET methods of Product Store APIs")
+    @Operation(summary = "Get product store by id", description = "Get product store by id")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Get product store by id successfully", 
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CommonResponse.class)) }),
+        @ApiResponse(responseCode = "404", description = "ProductStore not found", content = @Content)
+
+    })
     @GetMapping(
             path = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> getProductStoreById(@PathVariable String id) {
+    public ResponseEntity<?> getProductStoreById(@Parameter(description = "ID of product store to be retrieved", required = true) @PathVariable String id) {
         ProductStoreResponse productStoreResponse = productStoreService.getProductStoreById(id);
 
         CommonResponse<?> response = CommonResponse.builder()
@@ -92,28 +121,45 @@ public class ProductStoreController {
         return ResponseEntity.ok(response);
     }
 
+    @Tag(name = "Update product store", description = "PUT methods of Product Store APIs")
+    @Operation(summary = "Update product store", description = "Update existing Product store")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Updated product store with name successfully", 
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CommonResponse.class)) }),
+        @ApiResponse(responseCode = "404", description = "ProductStore not found", content = @Content)
+
+    })
     @PutMapping(
             path = "/{id}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> updateProductStore(@RequestBody UpdateProductStoreRequest request, @PathVariable String id) {
+    public ResponseEntity<?> updateProductStore(@RequestBody UpdateProductStoreRequest request,@Parameter(description = "ID of product store to be retrieved", required = true)
+     @PathVariable String id) {
         ProductStoreResponse productStoreResponse = productStoreService.updateProductStore(request, id);
 
         CommonResponse<?> response = CommonResponse.builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Updated product store with name " + productStoreResponse.getProductName() + " Successfully")
+                .message("Updated product store with name successfully")
                 .data(productStoreResponse)
                 .build();
 
         return ResponseEntity.ok(response);
     }
 
+    @Tag(name = "Delete product store", description = "DELETE methods of Product Store APIs")
+    @Operation(summary = "Delete product store", description = "Delete existing Product store")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Delete product store successfully", 
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CommonResponse.class)) }),
+        @ApiResponse(responseCode = "404", description = "ProductStore not found", content = @Content)
+
+    })
     @DeleteMapping(
             path = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> deleteProductStore(@PathVariable String id) {
+    public ResponseEntity<?> deleteProductStore(@Parameter(description = "ID of product store to be retrieved", required = true) @PathVariable String id) {
         productStoreService.deleteProductStore(id);
 
         CommonResponse<?> response = CommonResponse.builder()

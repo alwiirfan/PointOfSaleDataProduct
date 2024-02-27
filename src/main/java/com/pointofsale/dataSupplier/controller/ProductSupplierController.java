@@ -7,6 +7,15 @@ import com.pointofsale.dataSupplier.dto.response.CommonResponse;
 import com.pointofsale.dataSupplier.dto.response.PaginationResponse;
 import com.pointofsale.dataSupplier.dto.response.ProductSupplierResponse;
 import com.pointofsale.dataSupplier.service.ProductSupplierService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -21,6 +30,12 @@ public class ProductSupplierController {
 
     private final ProductSupplierService productSupplierService;
 
+    @Tag(name = "Create product supplier", description = "POST methods of Product Supplier APIs")
+    @Operation(summary = "Create product supplier", description = "Create Product into the supplier")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "created product supplier successfully", 
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CommonResponse.class))),
+    })
     @PostMapping(
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -39,6 +54,12 @@ public class ProductSupplierController {
                 .body(response);
     }
 
+    @Tag(name = "Get products supplier", description = "GET methods of Product Supplier APIs")
+    @Operation(summary = "Get all products supplier", description = "Get all products supplier")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Get All data products supplier successfully", 
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CommonResponse.class)) }),
+    })
     @GetMapping(
             produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -76,11 +97,20 @@ public class ProductSupplierController {
         return ResponseEntity.ok(response);
     }
 
+    @Tag(name = "Get product supplier", description = "GET methods of Product Supplier APIs")
+    @Operation(summary = "Get product supplier by id", description = "Get product supplier by id")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Get product supplier by id successfully" , 
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CommonResponse.class)) }),
+        @ApiResponse(responseCode = "404", description = "ProductSupplier not found", content = @Content)
+
+    })
     @GetMapping(
             path = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> getProductSupplierById(@PathVariable String id) {
+    public ResponseEntity<?> getProductSupplierById(@Parameter(description = "ID of product supplier to be retrieved", required = true) 
+        @PathVariable String id) {
         ProductSupplierResponse productSupplierResponse = productSupplierService.getById(id);
 
         CommonResponse<?> response = CommonResponse.builder()
@@ -92,12 +122,22 @@ public class ProductSupplierController {
         return ResponseEntity.ok(response);
     }
 
+    @Tag(name = "Update product supplier", description = "PUT methods of Product Supplier APIs")
+    @Operation(summary = "Update product supplier", description = "Update existing Product supplier")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Update data product supplier successfully", 
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,schema = @Schema(implementation = CommonResponse.class)) }),
+        @ApiResponse(responseCode = "404", description = "ProductSupplier not found", content = @Content)
+
+    })
     @PutMapping(
             path = "/{id}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> updateProductSupplier(@RequestBody UpdateProductSupplierRequest request, @PathVariable String id) {
+    public ResponseEntity<?> updateProductSupplier(@RequestBody UpdateProductSupplierRequest request, 
+        @Parameter(description = "ID of product supplier to be retrieved", required = true)
+        @PathVariable String id) {
         ProductSupplierResponse productSupplierResponse = productSupplierService.update(request, id);
 
         CommonResponse<?> response = CommonResponse.builder()
@@ -109,11 +149,20 @@ public class ProductSupplierController {
         return ResponseEntity.ok(response);
     }
 
+    @Tag(name = "Delete product supplier", description = "DELETE methods of Product Supplier APIs")
+    @Operation(summary = "Delete product supplier", description = "Delete existing Product supplier")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Delete data product supplier successfully" , 
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CommonResponse.class)) }),
+        @ApiResponse(responseCode = "404", description = "ProductSupplier not found", content = @Content)
+
+    })
     @DeleteMapping(
             path = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> deleteProductSupplier(@PathVariable String id) {
+    public ResponseEntity<?> deleteProductSupplier(@Parameter(description = "ID of product supplier to be retrieved", required = true) 
+        @PathVariable String id) {
         productSupplierService.delete(id);
 
         CommonResponse<?> response = CommonResponse.builder()
