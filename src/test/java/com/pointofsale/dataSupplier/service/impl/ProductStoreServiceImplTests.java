@@ -1,45 +1,25 @@
 package com.pointofsale.dataSupplier.service.impl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.lang.String;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Collections;
+import java.util.*;
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.pointofsale.dataSupplier.constant.ECategory;
-import com.pointofsale.dataSupplier.constant.ResponseMessage;
-import com.pointofsale.dataSupplier.dto.request.NewProductStoreRequest;
-import com.pointofsale.dataSupplier.dto.request.SearchProductStoreRequest;
-import com.pointofsale.dataSupplier.dto.request.UpdateProductStoreRequest;
+import com.pointofsale.dataSupplier.constant.*;
+import com.pointofsale.dataSupplier.dto.request.*;
 import com.pointofsale.dataSupplier.dto.response.ProductStoreResponse;
-import com.pointofsale.dataSupplier.entity.Category;
-import com.pointofsale.dataSupplier.entity.ProductPrice;
-import com.pointofsale.dataSupplier.entity.ProductStore;
+import com.pointofsale.dataSupplier.entity.*;
 import com.pointofsale.dataSupplier.repository.ProductStoreRepository;
-import com.pointofsale.dataSupplier.service.CategoryService;
-import com.pointofsale.dataSupplier.service.ProductPriceService;
-import com.pointofsale.dataSupplier.service.ProductStoreService;
+import com.pointofsale.dataSupplier.service.*;
 import com.pointofsale.dataSupplier.util.ValidationUtil;
 
 @SpringBootTest
@@ -128,9 +108,18 @@ public class ProductStoreServiceImplTests {
         request.setPurchasePrice(30);
 
         List<ProductPrice> dummyProductPrices = new ArrayList<>();
-        dummyProductPrices.add(new ProductPrice(new BigDecimal(100.00), new BigDecimal(200.00), 10, new ProductStore("121212", "dummy product1", "dummy product1", new Category(ECategory.MAKANAN), dummyProductPrices, "dummy product"), true));
-        dummyProductPrices.add(new ProductPrice(new BigDecimal(200.00), new BigDecimal(400.00), 10, new ProductStore("232323", "dummy product2", "dummy product2", new Category(ECategory.MAKANAN), dummyProductPrices, "dummy product"), true));
-        dummyProductPrices.add(new ProductPrice(new BigDecimal(400.00), new BigDecimal(500.00), 10, new ProductStore("343434", "dummy product3", "dummy product3", new Category(ECategory.MAKANAN), dummyProductPrices, "dummy product"), true));
+
+        dummyProductPrices.add(new ProductPrice(new BigDecimal(100.00), new BigDecimal(200.00), 10, 
+        new ProductStore("121212", "dummy product1", "dummy product1", 
+        new Category(ECategory.MAKANAN), dummyProductPrices, "dummy product"), true));
+
+        dummyProductPrices.add(new ProductPrice(new BigDecimal(200.00), new BigDecimal(400.00), 10, 
+        new ProductStore("232323", "dummy product2", "dummy product2", 
+        new Category(ECategory.MAKANAN), dummyProductPrices, "dummy product"), true));
+
+        dummyProductPrices.add(new ProductPrice(new BigDecimal(400.00), new BigDecimal(500.00), 10, 
+        new ProductStore("343434", "dummy product3", "dummy product3", 
+        new Category(ECategory.MAKANAN), dummyProductPrices, "dummy product"), true));
 
         // mock behavior
         Page<ProductPrice> mockProductPrices = new PageImpl<>(dummyProductPrices, pageable, dummyProductPrices.size());
