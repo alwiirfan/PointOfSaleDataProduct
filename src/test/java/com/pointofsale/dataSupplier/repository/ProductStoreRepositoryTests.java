@@ -30,8 +30,8 @@ public class ProductStoreRepositoryTests {
         dummyProductStore.setProductCode(productCode);
         dummyProductStore.setProductName("dummy product");
         dummyProductStore.setDescription("dummy product");
-        dummyProductStore.setProductPrices(null);
-        dummyProductStore.setCategory(new Category(ECategory.MAKANAN));
+        // dummyProductStore.setProductPrices(null);
+        // dummyProductStore.setCategory(new Category(ECategory.MAKANAN));
         dummyProductStore.setMerk("ALL");
 
         // Act

@@ -1,16 +1,16 @@
 package com.pointofsale.dataSupplier.entity;
 
+import com.pointofsale.dataSupplier.entity.embeddable.ProductPrice;
+
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "product_store")
+@Table(name = "product_stores")
 @Builder(toBuilder = true)
 public class ProductStore extends BaseEntity {
 
@@ -27,13 +27,10 @@ public class ProductStore extends BaseEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToMany(mappedBy = "productStore", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
-    private List<ProductPrice> productPrices;
-
     @Column(name = "merk", length = 200)
     private String merk;
 
-    public void addProductPrice(ProductPrice productPrice) {
-        productPrices.add(productPrice);
-    }
+    @Embedded
+    private ProductPrice productPrice;
+
 }

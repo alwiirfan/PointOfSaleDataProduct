@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "product_supplier")
+@Table(name = "product_suppliers")
 @Builder(toBuilder = true)
 public class ProductSupplier extends BaseEntity {
 

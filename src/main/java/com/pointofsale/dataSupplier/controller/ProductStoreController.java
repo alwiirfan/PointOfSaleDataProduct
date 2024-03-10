@@ -27,11 +27,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(path = "/api/v1/products-store")
 @RequiredArgsConstructor
+@Tag(name = "PRODUCTS STORE", description = "methods of Product Store APIs")
 public class ProductStoreController {
 
     private final ProductStoreService productStoreService;
 
-    @Tag(name = "Create product store", description = "POST methods of Product Store APIs")
     @Operation(summary = "Create product store", description = "Create Product into the store")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Successfully create product into the store", 
@@ -55,7 +55,6 @@ public class ProductStoreController {
                 .body(response);
     }
 
-    @Tag(name = "Get products store", description = "GET methods of Product Store APIs")
     @Operation(summary = "Get all products store", description = "Get all products store")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Get all products in store successfully", 
@@ -89,15 +88,14 @@ public class ProductStoreController {
                 .pagination(PaginationResponse.builder()
                         .count(responsePage.getTotalElements())
                         .totalPage(responsePage.getTotalPages())
-                        .page(page)
-                        .size(size)
+                        .page(responsePage.getNumberOfElements())
+                        .size(responsePage.getSize())
                         .build())
                 .build();
 
         return ResponseEntity.ok(response);
     }
 
-    @Tag(name = "Get product store", description = "GET methods of Product Store APIs")
     @Operation(summary = "Get product store by id", description = "Get product store by id")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Get product store by id successfully", 
@@ -121,7 +119,6 @@ public class ProductStoreController {
         return ResponseEntity.ok(response);
     }
 
-    @Tag(name = "Update product store", description = "PUT methods of Product Store APIs")
     @Operation(summary = "Update product store", description = "Update existing Product store")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Updated product store with name successfully", 
@@ -147,7 +144,6 @@ public class ProductStoreController {
         return ResponseEntity.ok(response);
     }
 
-    @Tag(name = "Delete product store", description = "DELETE methods of Product Store APIs")
     @Operation(summary = "Delete product store", description = "Delete existing Product store")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Delete product store successfully", 
@@ -165,6 +161,32 @@ public class ProductStoreController {
         CommonResponse<?> response = CommonResponse.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Delete product store successfully")
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary ="Get all product store by category", description = "GET methods of Product Store APIs")
+    @GetMapping( 
+            path = "/category",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<?> getAllProductStoreByCategory(@Parameter(description = "Category of product store to be retrieved", required = true)
+                                                                        @RequestParam( value = "category") String category,
+                                                            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+                                                            @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
+        Page<ProductStoreResponse> responsePage = productStoreService.getAllProductStoreByCategory(category, page, size);
+
+        CommonResponse<?> response = CommonResponse.builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Get all products in store successfully")
+                .data(responsePage.getContent())
+                .pagination(PaginationResponse.builder()
+                        .count(responsePage.getTotalElements())
+                        .totalPage(responsePage.getTotalPages())
+                        .page(responsePage.getNumberOfElements())
+                        .size(responsePage.getSize())
+                        .build())
                 .build();
 
         return ResponseEntity.ok(response);

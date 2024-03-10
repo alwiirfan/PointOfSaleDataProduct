@@ -26,11 +26,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/api/v1/products-supplier")
+@Tag(name = "PRODUCTS SUPPLIER", description = "methods of Product Supplier APIs")
 public class ProductSupplierController {
 
     private final ProductSupplierService productSupplierService;
 
-    @Tag(name = "Create product supplier", description = "POST methods of Product Supplier APIs")
     @Operation(summary = "Create product supplier", description = "Create Product into the supplier")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "created product supplier successfully", 
@@ -54,7 +54,6 @@ public class ProductSupplierController {
                 .body(response);
     }
 
-    @Tag(name = "Get products supplier", description = "GET methods of Product Supplier APIs")
     @Operation(summary = "Get all products supplier", description = "Get all products supplier")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Get All data products supplier successfully", 
@@ -97,7 +96,6 @@ public class ProductSupplierController {
         return ResponseEntity.ok(response);
     }
 
-    @Tag(name = "Get product supplier", description = "GET methods of Product Supplier APIs")
     @Operation(summary = "Get product supplier by id", description = "Get product supplier by id")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Get product supplier by id successfully" , 
@@ -122,7 +120,6 @@ public class ProductSupplierController {
         return ResponseEntity.ok(response);
     }
 
-    @Tag(name = "Update product supplier", description = "PUT methods of Product Supplier APIs")
     @Operation(summary = "Update product supplier", description = "Update existing Product supplier")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Update data product supplier successfully", 
@@ -149,7 +146,6 @@ public class ProductSupplierController {
         return ResponseEntity.ok(response);
     }
 
-    @Tag(name = "Delete product supplier", description = "DELETE methods of Product Supplier APIs")
     @Operation(summary = "Delete product supplier", description = "Delete existing Product supplier")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Delete data product supplier successfully" , 
