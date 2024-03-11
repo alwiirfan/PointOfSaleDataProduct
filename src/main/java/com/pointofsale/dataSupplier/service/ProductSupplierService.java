@@ -12,4 +12,6 @@ public interface ProductSupplierService {
     ProductSupplierResponse getById(String id);
     ProductSupplierResponse update(UpdateProductSupplierRequest request, String id);
     void delete(String id);
+
+    Page<ProductSupplierResponse> getAllProductSupplierByCategory(String category, Integer page, Integer size);
 }

@@ -25,6 +25,14 @@ public class NewProductSupplierRequest {
     @Min(value = 0, message = "unit price must be greater than or equal to 0")
     private BigDecimal unitPrice;
 
+    @NotBlank(message = "category is required")
+    @Size(min = 2, message = "must be 2 characters input to category")
+    private String category;
+
+    @NotBlank(message = "merk is required")
+    @Size(min = 2, message = "must be 2 characters input to merk")
+    private String merk;
+
     @NotNull(message = "total item is required")
     @Min(value = 2, message = "total item must be greater than or equal to 2")
     private Integer totalItem;

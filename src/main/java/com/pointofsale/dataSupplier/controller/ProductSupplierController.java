@@ -168,4 +168,30 @@ public class ProductSupplierController {
 
         return ResponseEntity.ok(response);
     }
+
+    @Operation(summary ="Get all product supplier by category", description = "GET methods of Product Supplier APIs")
+    @GetMapping(
+            path = "/category",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<?> getAllProductSupplierByCategory(@Parameter(description = "Category of product supplier to be retrieved", required = true) 
+                                                                @RequestParam(value = "category") String category,
+                                                             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+                                                             @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
+        Page<ProductSupplierResponse> responsePage = productSupplierService.getAllProductSupplierByCategory(category, page, size);
+
+        CommonResponse<?> response = CommonResponse.builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Get All data products supplier successfully")
+                .data(responsePage.getContent())
+                .pagination(PaginationResponse.builder()
+                        .count(responsePage.getTotalElements())
+                        .totalPage(responsePage.getTotalPages())
+                        .page(responsePage.getNumberOfElements())
+                        .size(responsePage.getSize())
+                        .build())
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
 }

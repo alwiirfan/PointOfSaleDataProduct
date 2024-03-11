@@ -5,8 +5,10 @@ import com.pointofsale.dataSupplier.dto.request.NewProductSupplierRequest;
 import com.pointofsale.dataSupplier.dto.request.SearchProductSupplierRequest;
 import com.pointofsale.dataSupplier.dto.request.UpdateProductSupplierRequest;
 import com.pointofsale.dataSupplier.dto.response.ProductSupplierResponse;
+import com.pointofsale.dataSupplier.entity.Category;
 import com.pointofsale.dataSupplier.entity.ProductSupplier;
 import com.pointofsale.dataSupplier.repository.ProductSupplierRepository;
+import com.pointofsale.dataSupplier.service.CategoryService;
 import com.pointofsale.dataSupplier.service.ProductSupplierService;
 import com.pointofsale.dataSupplier.util.ValidationUtil;
 import jakarta.persistence.criteria.Predicate;
@@ -31,6 +33,7 @@ import java.util.Objects;
 public class ProductSupplierServiceImpl implements ProductSupplierService {
 
     private final ProductSupplierRepository productSupplierRepository;
+    private final CategoryService categoryService;
     private final ValidationUtil validationUtil;
 
     @Transactional(rollbackFor = Exception.class)
@@ -38,21 +41,35 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
     public ProductSupplierResponse create(NewProductSupplierRequest request) {
         validationUtil.validate(request);
 
-        BigDecimal unitPrice = request.getUnitPrice();
-        Integer totalItem = request.getTotalItem();
+        try {
+            String categoryString = request.getCategory();
+            if (categoryString.isEmpty() || categoryString.isBlank()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                        ResponseMessage.getBadRequest(Category.class));
+            }
 
-        BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(totalItem));
+            Category category = categoryService.getCategoryByECategory(categoryString.toUpperCase());
 
-        ProductSupplier productSupplier = ProductSupplier.builder()
-                .productName(request.getProductName())
-                .unitPrice(unitPrice)
-                .totalItem(totalItem)
-                .totalPrice(totalPrice)
-                .build();
+            BigDecimal unitPrice = request.getUnitPrice();
+            Integer totalItem = request.getTotalItem();
 
-        productSupplierRepository.save(productSupplier);
+            BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(totalItem));
 
-        return toProductSupplierResponse(productSupplier);
+            ProductSupplier productSupplier = ProductSupplier.builder()
+                    .productName(request.getProductName())
+                    .category(category)
+                    .unitPrice(unitPrice)
+                    .totalItem(totalItem)
+                    .totalPrice(totalPrice)
+                    .merk(request.getMerk())
+                    .build();
+
+            productSupplierRepository.save(productSupplier);
+
+            return toProductSupplierResponse(productSupplier);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     @Transactional(readOnly = true)
@@ -117,9 +134,18 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
     public ProductSupplierResponse update(UpdateProductSupplierRequest request, String id) {
         validationUtil.validate(request);
 
-        ProductSupplier productSupplier = productSupplierRepository.findById(id)
+        try {
+            ProductSupplier productSupplier = productSupplierRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ResponseMessage.getNotFoundResource(ProductSupplier.class)));
+
+            String categoryString = request.getCategory();
+            if (categoryString.isEmpty() || categoryString.isBlank()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                        ResponseMessage.getBadRequest(Category.class));
+            }
+
+            Category category = categoryService.getCategoryByECategory(categoryString.toUpperCase());
 
         if (productSupplier != null) {
             Integer totalItem = request.getTotalItem();
@@ -128,17 +154,19 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
             BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(totalItem));
 
             productSupplier.setProductName(request.getProductName());
+            productSupplier.setCategory(category);
             productSupplier.setUnitPrice(request.getUnitPrice());
             productSupplier.setTotalItem(request.getTotalItem());
             productSupplier.setTotalPrice(totalPrice);
-
+            productSupplier.setMerk(request.getMerk());
 
             productSupplierRepository.save(productSupplier);
-
-            return toProductSupplierResponse(productSupplier);
         }
 
-        return null;
+            return toProductSupplierResponse(productSupplier);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -155,9 +183,22 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
         return ProductSupplierResponse.builder()
                 .productSupplierId(productSupplier.getId())
                 .productName(productSupplier.getProductName())
+                .category(productSupplier.getCategory().getCategory())
                 .unitPrice(productSupplier.getUnitPrice())
                 .totalItem(productSupplier.getTotalItem())
                 .totalPrice(productSupplier.getTotalPrice())
+                .merk(productSupplier.getMerk())
                 .build();
+    }
+
+    @Override
+    public Page<ProductSupplierResponse> getAllProductSupplierByCategory(String category, Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<ProductSupplier> productSuppliers = productSupplierRepository.findAllProductSupplierByCategory(category, pageable);
+
+        List<ProductSupplierResponse> responses = productSuppliers.stream().map(this::toProductSupplierResponse).toList();
+
+        return new PageImpl<>(responses, pageable, productSuppliers.getTotalElements());
     }
 }

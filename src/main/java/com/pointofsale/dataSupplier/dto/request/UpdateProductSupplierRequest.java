@@ -20,6 +20,10 @@ public class UpdateProductSupplierRequest {
     @Size(min = 2, message = "must be 2 characters input to product name")
     private String productName;
 
+    @NotBlank(message = "category is required")
+    @Size(min = 2, message = "must be 2 characters input to category")
+    private String category;
+
     @NotNull(message = "unit price is required")
     @Min(value = 0, message = "unit price must be greater than or equal to 0")
     private BigDecimal unitPrice;
@@ -27,5 +31,9 @@ public class UpdateProductSupplierRequest {
     @NotNull(message = "total item is required")
     @Min(value = 2, message = "total item must be greater than or equal to 2")
     private Integer totalItem;
+
+    @NotBlank(message = "merk is required")
+    @Size(min = 2, message = "must be 2 characters input to merk")
+    private String merk;
 
 }
