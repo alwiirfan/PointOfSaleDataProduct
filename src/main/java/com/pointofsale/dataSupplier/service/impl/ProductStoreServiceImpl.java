@@ -49,7 +49,7 @@ public class ProductStoreServiceImpl implements ProductStoreService {
                         ResponseMessage.getBadRequest(Category.class));
             }
 
-            Category category = categoryService.getCategoryByECategory(categoryString.toUpperCase());
+            Category category = categoryService.getCategoryByCategory(categoryString.toUpperCase());
 
             ProductStore productStore = ProductStore.builder()
                     .productCode(request.getProductCode())
@@ -64,6 +64,9 @@ public class ProductStoreServiceImpl implements ProductStoreService {
                             .build())
                     .merk(request.getMerk())
                     .build();
+
+            productStore.setCreatedAt(new Date());
+            productStore.setUpdatedAt(null);
 
             productStoreRepository.saveAndFlush(productStore);
 
@@ -129,6 +132,16 @@ public class ProductStoreServiceImpl implements ProductStoreService {
 
     @Transactional(readOnly = true)
     @Override
+    public ProductStoreResponse getProductStoreByProductStoreCode(String productStoreCode) {
+        ProductStore productStore = productStoreRepository.findFirstByProductCode(productStoreCode)
+                                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                            ResponseMessage.getNotFoundResource(ProductStore.class)));
+
+        return toProductStoreResponse(productStore);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
     public ProductStoreResponse getProductStoreById(String id) {
         ProductStore productStore = productStoreRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -155,7 +168,7 @@ public class ProductStoreServiceImpl implements ProductStoreService {
                             ResponseMessage.getBadRequest(Category.class));
             }
 
-            Category category = categoryService.getCategoryByECategory(categoryString.toUpperCase());
+            Category category = categoryService.getCategoryByCategory(categoryString.toUpperCase());
 
             ProductStore productStore = findByIdOrThrowNotFound(id);
             
@@ -169,6 +182,8 @@ public class ProductStoreServiceImpl implements ProductStoreService {
                     .sellingPrice(request.getSellingPrice())
                     .isActive(request.isActive())
                     .build());
+
+            productStore.setUpdatedAt(new Date());
 
             productStoreRepository.save(productStore);
             return toProductStoreResponse(productStore);
@@ -196,9 +211,12 @@ public class ProductStoreServiceImpl implements ProductStoreService {
                 .productSellingPrice(productStore.getProductPrice().getSellingPrice())
                 .productStock(productStore.getProductPrice().getStock())
                 .productMerk(productStore.getMerk())
+                .createdAt(productStore.getCreatedAt().toString())
+                .updatedAt(productStore.getUpdatedAt().toString())
                 .build();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<ProductStoreResponse> getAllProductStoreByCategory(String category, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);

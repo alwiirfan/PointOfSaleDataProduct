@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
     @Service
@@ -30,6 +31,7 @@ import org.springframework.web.server.ResponseStatusException;
         private final CategoryRepository categoryRepository;
         private final ValidationUtil validationUtil;
 
+        @Transactional(rollbackFor = Exception.class)
         @Override
         public CategoryResponse saveCategory(NewCategoryRequest request) {
             validationUtil.validate(request);
@@ -49,8 +51,9 @@ import org.springframework.web.server.ResponseStatusException;
             }
         }
 
+    
     @Override
-    public Category getCategoryByECategory(String category) {
+    public Category getCategoryByCategory(String category) {
         return categoryRepository
                 .findFirstByCategory(category)
                 .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -58,6 +61,7 @@ import org.springframework.web.server.ResponseStatusException;
 
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<CategoryResponse> findAllCategories(String category, Integer page, Integer size) {
         Specification<Category> specification = (root, query, criteriaBuilder) -> {
@@ -86,5 +90,15 @@ import org.springframework.web.server.ResponseStatusException;
                                 .createdAt(category.getCreatedAt().toString())
                                 .updatedAt(category.getUpdatedAt().toString())
                                 .build();
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void deleteCategory(String id) {
+        Category category = categoryRepository.findById(id)
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
+                                        ResponseMessage.getNotFoundResource(Category.class)));
+
+        categoryRepository.delete(category);
     }
 }

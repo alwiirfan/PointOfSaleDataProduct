@@ -11,6 +11,7 @@ public interface ProductStoreService {
     ProductStoreResponse createProductStore(NewProductStoreRequest request);
     Page<ProductStoreResponse> getAllProductStore(SearchProductStoreRequest request, Integer page, Integer size);
     ProductStoreResponse getProductStoreById(String id);
+    ProductStoreResponse getProductStoreByProductStoreCode(String productStoreCode);
     ProductStoreResponse updateProductStore(UpdateProductStoreRequest request, String id);
     void deleteProductStore(String id);
 

@@ -8,6 +8,7 @@ import com.pointofsale.dataSupplier.entity.Category;
 
 public interface CategoryService {
     CategoryResponse saveCategory(NewCategoryRequest request);
-    Category getCategoryByECategory(String eCategory);
+    Category getCategoryByCategory(String eCategory);
     Page<CategoryResponse> findAllCategories(String category, Integer page, Integer size);
+    void deleteCategory(String id);
 }

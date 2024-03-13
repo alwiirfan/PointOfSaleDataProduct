@@ -21,7 +21,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -89,4 +91,16 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
     
+    @DeleteMapping(
+        path = "/{id}",
+        produces = MediaType.APPLICATION_JSON_VALUE
+        )
+    public ResponseEntity<?> deleteCategory(@PathVariable("id") String id) {
+        categoryService.deleteCategory(id);
+        CommonResponse<?> response = CommonResponse.builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Successfully delete category")
+                .build();
+        return ResponseEntity.ok(response);
+    }
 }

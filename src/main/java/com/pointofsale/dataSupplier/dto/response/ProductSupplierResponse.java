@@ -19,4 +19,6 @@ public class ProductSupplierResponse {
     private Integer totalItem;
     private BigDecimal totalPrice;
     private String merk;
+    private String createdAt;
+    private String updatedAt;
 }

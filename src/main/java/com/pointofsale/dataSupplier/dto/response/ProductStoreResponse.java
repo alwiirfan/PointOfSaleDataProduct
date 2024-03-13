@@ -21,5 +21,7 @@ public class ProductStoreResponse {
     private BigDecimal productSellingPrice;
     private Integer productStock;
     private String productMerk;
+    private String createdAt;
+    private String updatedAt;
 
 }

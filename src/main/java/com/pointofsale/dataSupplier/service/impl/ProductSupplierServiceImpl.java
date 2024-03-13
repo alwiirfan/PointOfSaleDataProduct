@@ -25,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -48,7 +49,7 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
                         ResponseMessage.getBadRequest(Category.class));
             }
 
-            Category category = categoryService.getCategoryByECategory(categoryString.toUpperCase());
+            Category category = categoryService.getCategoryByCategory(categoryString.toUpperCase());
 
             BigDecimal unitPrice = request.getUnitPrice();
             Integer totalItem = request.getTotalItem();
@@ -63,6 +64,9 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
                     .totalPrice(totalPrice)
                     .merk(request.getMerk())
                     .build();
+
+            productSupplier.setCreatedAt(new Date());
+            productSupplier.setUpdatedAt(null);
 
             productSupplierRepository.save(productSupplier);
 
@@ -80,7 +84,7 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
 
             // product supplier name
             if (Objects.nonNull(request.getProductName())){
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("productName")), "%" +request.getProductName().toLowerCase()+ "%"));
+                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("productName")), "%" +request.getProductName().toUpperCase()+ "%"));
             }
 
             // total item
@@ -145,7 +149,7 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
                         ResponseMessage.getBadRequest(Category.class));
             }
 
-            Category category = categoryService.getCategoryByECategory(categoryString.toUpperCase());
+            Category category = categoryService.getCategoryByCategory(categoryString.toUpperCase());
 
         if (productSupplier != null) {
             Integer totalItem = request.getTotalItem();
@@ -159,6 +163,8 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
             productSupplier.setTotalItem(request.getTotalItem());
             productSupplier.setTotalPrice(totalPrice);
             productSupplier.setMerk(request.getMerk());
+
+            productSupplier.setUpdatedAt(new Date());
 
             productSupplierRepository.save(productSupplier);
         }
@@ -188,9 +194,12 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
                 .totalItem(productSupplier.getTotalItem())
                 .totalPrice(productSupplier.getTotalPrice())
                 .merk(productSupplier.getMerk())
+                .createdAt(productSupplier.getCreatedAt().toString())
+                .updatedAt(productSupplier.getUpdatedAt().toString())
                 .build();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<ProductSupplierResponse> getAllProductSupplierByCategory(String category, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
