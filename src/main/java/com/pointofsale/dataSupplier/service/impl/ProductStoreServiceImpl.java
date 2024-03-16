@@ -66,7 +66,6 @@ public class ProductStoreServiceImpl implements ProductStoreService {
                     .build();
 
             productStore.setCreatedAt(new Date());
-            productStore.setUpdatedAt(null);
 
             productStoreRepository.saveAndFlush(productStore);
 
@@ -212,7 +211,7 @@ public class ProductStoreServiceImpl implements ProductStoreService {
                 .productStock(productStore.getProductPrice().getStock())
                 .productMerk(productStore.getMerk())
                 .createdAt(productStore.getCreatedAt().toString())
-                .updatedAt(productStore.getUpdatedAt().toString())
+                .updatedAt(productStore.getUpdatedAt() != null ? productStore.getUpdatedAt().toString() : null)
                 .build();
     }
 

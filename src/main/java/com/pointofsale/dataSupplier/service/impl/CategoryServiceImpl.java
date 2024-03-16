@@ -41,7 +41,6 @@ import org.springframework.web.server.ResponseStatusException;
                         .build();
 
                 category.setCreatedAt(new Date());
-                category.setUpdatedAt(null);
 
                 categoryRepository.save(category);
 
@@ -88,7 +87,7 @@ import org.springframework.web.server.ResponseStatusException;
                                 .categoryId(category.getId())
                                 .category(category.getCategory())
                                 .createdAt(category.getCreatedAt().toString())
-                                .updatedAt(category.getUpdatedAt().toString())
+                                .updatedAt(category.getUpdatedAt() != null ? category.getUpdatedAt().toString() : null)
                                 .build();
     }
 

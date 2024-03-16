@@ -66,7 +66,6 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
                     .build();
 
             productSupplier.setCreatedAt(new Date());
-            productSupplier.setUpdatedAt(null);
 
             productSupplierRepository.save(productSupplier);
 
@@ -195,7 +194,7 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
                 .totalPrice(productSupplier.getTotalPrice())
                 .merk(productSupplier.getMerk())
                 .createdAt(productSupplier.getCreatedAt().toString())
-                .updatedAt(productSupplier.getUpdatedAt().toString())
+                .updatedAt(productSupplier.getUpdatedAt() != null ? productSupplier.getUpdatedAt().toString() : null)
                 .build();
     }
 
