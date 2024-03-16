@@ -179,7 +179,7 @@ public class ProductStoreServiceImpl implements ProductStoreService {
                     .stock(request.getProductStock())
                     .purchasePrice(request.getPurchasePrice())
                     .sellingPrice(request.getSellingPrice())
-                    .isActive(request.isActive())
+                    .isActive(request.getIsActive())
                     .build());
 
             productStore.setUpdatedAt(new Date());
@@ -209,6 +209,7 @@ public class ProductStoreServiceImpl implements ProductStoreService {
                 .productPurchasePrice(productStore.getProductPrice().getPurchasePrice())
                 .productSellingPrice(productStore.getProductPrice().getSellingPrice())
                 .productStock(productStore.getProductPrice().getStock())
+                .isActive(productStore.getProductPrice().getIsActive())
                 .productMerk(productStore.getMerk())
                 .createdAt(productStore.getCreatedAt().toString())
                 .updatedAt(productStore.getUpdatedAt() != null ? productStore.getUpdatedAt().toString() : null)

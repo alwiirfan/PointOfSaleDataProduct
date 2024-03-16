@@ -36,8 +36,8 @@ public class UpdateProductStoreRequest {
     @Min(value = 0, message = "stock must be greater than or equal to 0")
     private Integer productStock;
 
-    @NotNull(message = "is active is required")
-    private boolean isActive;
+    @NotNull(message = "is active is required and the value must be true or false")
+    private Boolean isActive;
 
     @NotBlank(message = "merk is required")
     private String merk;

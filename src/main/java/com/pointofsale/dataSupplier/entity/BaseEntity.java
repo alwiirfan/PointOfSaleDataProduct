@@ -1,7 +1,6 @@
 package com.pointofsale.dataSupplier.entity;
 
 import jakarta.persistence.*;
-
 import lombok.Data;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -17,9 +16,11 @@ public class BaseEntity {
     @Column(name = "id")
     protected String Id;
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "created_at")
     protected Date createdAt;
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "updated_at")
     protected Date updatedAt;
 

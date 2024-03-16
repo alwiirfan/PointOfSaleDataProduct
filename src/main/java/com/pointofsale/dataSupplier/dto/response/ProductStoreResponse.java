@@ -20,6 +20,7 @@ public class ProductStoreResponse {
     private BigDecimal productPurchasePrice;
     private BigDecimal productSellingPrice;
     private Integer productStock;
+    private Boolean isActive;
     private String productMerk;
     private String createdAt;
     private String updatedAt;
