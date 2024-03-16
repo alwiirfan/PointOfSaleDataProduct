@@ -45,7 +45,7 @@ import org.springframework.web.server.ResponseStatusException;
                 categoryRepository.save(category);
 
                 return toCategoryResponse(category);
-            } catch (ResponseStatusException e) {
+            } catch (IllegalArgumentException e) {
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ResponseMessage.getInternalServerError(Category.class), e);
             }
         }
@@ -82,6 +82,33 @@ import org.springframework.web.server.ResponseStatusException;
         return new PageImpl<>(categoryList, pageable, categories.getTotalElements());
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CategoryResponse updateCategory(String id, NewCategoryRequest request) {
+        validationUtil.validate(request);
+
+        try {
+            Category category = categoryRepository.findById(id)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
+                            ResponseMessage.getNotFoundResource(Category.class)));
+
+            String categoryString = request.getCategory();
+            if (categoryString.isEmpty() || categoryString.isBlank()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                        ResponseMessage.getBadRequest(Category.class));
+            }
+
+            category.setCategory(categoryString.toUpperCase());
+            category.setUpdatedAt(new Date());
+
+            categoryRepository.save(category);
+
+            return toCategoryResponse(category);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ResponseMessage.getInternalServerError(Category.class), e);
+        }
+    }
+
     private CategoryResponse toCategoryResponse(Category category) {
         return CategoryResponse.builder()
                                 .categoryId(category.getId())
@@ -100,4 +127,5 @@ import org.springframework.web.server.ResponseStatusException;
 
         categoryRepository.delete(category);
     }
+
 }

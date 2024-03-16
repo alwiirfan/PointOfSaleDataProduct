@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
@@ -88,6 +89,21 @@ public class CategoryController {
                         .build())
                 .build();
         
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping(
+        path = "/{id}",
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<?> updateCategory(@RequestBody NewCategoryRequest request, @PathVariable("id") String id) {
+        CategoryResponse category = categoryService.updateCategory(id, request);
+        CommonResponse<?> response = CommonResponse.builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Successfully update category")
+                .data(category)
+                .build();
         return ResponseEntity.ok(response);
     }
     
