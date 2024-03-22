@@ -13,12 +13,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class NewProductStoreRequest {
-    @NotBlank(message = "product code is required")
-    @Size(min = 6, max = 6, message = "Product code must be exactly 6 characters long")
-    @Pattern(regexp = "\\d+", message = "Product code must contain only digits")
-    @Pattern(regexp = "\\S+", message = "Product code must not contain spaces")
-    private String productCode;
-
+    
     @NotBlank(message = "product name is required")
     private String productName;
 

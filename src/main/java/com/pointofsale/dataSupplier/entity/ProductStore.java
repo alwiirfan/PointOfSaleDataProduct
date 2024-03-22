@@ -10,11 +10,11 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "product_stores")
+@Table(name = "products_store")
 @Builder(toBuilder = true)
 public class ProductStore extends BaseEntity {
 
-    @Column(name = "product_code", length = 6 ,unique = true)
+    @Column(name = "product_code", length = 7 ,unique = true)
     private String productCode;
 
     @Column(name = "product_name", length = 300, nullable = false)

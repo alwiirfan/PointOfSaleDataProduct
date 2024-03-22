@@ -60,7 +60,7 @@ public class ProductStoreControllerTests {
     @BeforeEach
     public void init() {
         // category = Category.builder().category(eCategory).build();
-        dummyProductStoreRequest = NewProductStoreRequest.builder().productCategory(eCategory.getName()).productName("product").productCode("121212").description("product remek").productStock(10).purchasePrice(new BigDecimal(100.00)).sellingPrice(new BigDecimal(200.00)).merk("sapi").build();
+        // dummyProductStoreRequest = NewProductStoreRequest.builder().productCategory(eCategory.getName()).productName("product").productCode("121212").description("product remek").productStock(10).purchasePrice(new BigDecimal(100.00)).sellingPrice(new BigDecimal(200.00)).merk("sapi").build();
         dummyProductPrice = ProductPrice.builder().purchasePrice(dummyProductStoreRequest.getPurchasePrice()).sellingPrice(dummyProductStoreRequest.getSellingPrice()).stock(dummyProductStoreRequest.getProductStock()).build();
         // dummyProductStore = ProductStore.builder().productCode("121212").productName("product").description("product remek").productPrices(Collections.singletonList(dummyProductPrice)).category(category).merk("sapi").build();
         dummyProductStoreResponse = ProductStoreResponse.builder().productCode("121212").productName("product").productDescription("product remek").productCategory(eCategory.getName()).productMerk("sapi").productPurchasePrice(new BigDecimal(100.00)).productSellingPrice(new BigDecimal(200.00)).productStock(10).build();  

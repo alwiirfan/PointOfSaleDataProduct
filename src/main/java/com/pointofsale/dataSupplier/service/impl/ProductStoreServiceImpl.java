@@ -11,6 +11,7 @@ import com.pointofsale.dataSupplier.entity.embeddable.ProductPrice;
 import com.pointofsale.dataSupplier.repository.ProductStoreRepository;
 import com.pointofsale.dataSupplier.service.CategoryService;
 import com.pointofsale.dataSupplier.service.ProductStoreService;
+import com.pointofsale.dataSupplier.util.RandomUtil;
 import com.pointofsale.dataSupplier.util.ValidationUtil;
 
 import jakarta.persistence.criteria.Predicate;
@@ -36,6 +37,7 @@ public class ProductStoreServiceImpl implements ProductStoreService {
     private final ProductStoreRepository productStoreRepository;
     private final CategoryService categoryService;
     private final ValidationUtil validationUtil;
+    private final RandomUtil randomUtil;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -51,8 +53,10 @@ public class ProductStoreServiceImpl implements ProductStoreService {
 
             Category category = categoryService.getCategoryByCategory(categoryString.toUpperCase());
 
+            String productCode = randomUtil.generateRandomString(6);
+
             ProductStore productStore = ProductStore.builder()
-                    .productCode(request.getProductCode())
+                    .productCode(productCode)
                     .productName(request.getProductName())
                     .category(category)
                     .description(request.getDescription())

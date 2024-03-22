@@ -38,7 +38,7 @@ public class ProductStoreServiceImplTests {
     void itShouldWhenReturnSuccessCreateProductStore() {
         // dummy request
         NewProductStoreRequest dummyRequest = new NewProductStoreRequest();
-        dummyRequest.setProductCode("121212");
+        // dummyRequest.setProductCode("121212");
         dummyRequest.setProductName("dummy product");
         dummyRequest.setDescription("dummy product store");
         dummyRequest.setProductCategory("Makanan");
@@ -61,7 +61,7 @@ public class ProductStoreServiceImplTests {
 
         // dummy product store
         ProductStore dummyProductStore = new ProductStore();
-        dummyProductStore.setProductCode(dummyRequest.getProductCode());
+        // dummyProductStore.setProductCode(dummyRequest.getProductCode());
         dummyProductStore.setProductName(dummyRequest.getProductName());
         // dummyProductStore.setCategory(category);
         // dummyProductStore.setProductPrices(Collections.singletonList(dummyProductPrice));

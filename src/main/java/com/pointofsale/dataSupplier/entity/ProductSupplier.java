@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "product_suppliers")
+@Table(name = "products_supplier")
 @Builder(toBuilder = true)
 public class ProductSupplier extends BaseEntity {
 
