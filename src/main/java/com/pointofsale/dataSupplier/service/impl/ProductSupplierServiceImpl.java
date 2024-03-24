@@ -40,6 +40,7 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public ProductSupplierResponse create(NewProductSupplierRequest request) {
+        // TODO validate request
         validationUtil.validate(request);
 
         try {
@@ -49,13 +50,16 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
                         ResponseMessage.getBadRequest(Category.class));
             }
 
+            // TODO get or add return of category
             Category category = categoryService.getCategoryByCategory(categoryString.toUpperCase());
 
             BigDecimal unitPrice = request.getUnitPrice();
             Integer totalItem = request.getTotalItem();
 
+            // TODO calculate total price
             BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(totalItem));
 
+            // TODO create product supplier
             ProductSupplier productSupplier = ProductSupplier.builder()
                     .productName(request.getProductName())
                     .category(category)
@@ -69,8 +73,10 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
 
             productSupplierRepository.save(productSupplier);
 
+            // TODO return response of product supplier
             return toProductSupplierResponse(productSupplier);
         } catch (IllegalArgumentException e) {
+            // TODO throw exception
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
@@ -78,35 +84,36 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
     @Transactional(readOnly = true)
     @Override
     public Page<ProductSupplierResponse> getAll(SearchProductSupplierRequest request, Integer page, Integer size) {
+        // TODO create specification based on request
         Specification<ProductSupplier> specification = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            // product supplier name
+            // TODO filter by product supplier name
             if (Objects.nonNull(request.getProductName())){
                 predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("productName")), "%" +request.getProductName().toUpperCase()+ "%"));
             }
 
-            // total item
+            // TODO filter by total item
             if (Objects.nonNull(request.getTotalItem())){
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("totalItem"), request.getTotalItem()));
             }
 
-            // minimum unit price
+            // TODO filter by minimum unit price
             if (Objects.nonNull(request.getMinUnitPrice())){
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("unitPrice"), request.getMinUnitPrice()));
             }
 
-            // minimum total price
+            // TODO filter by minimum total price
             if (Objects.nonNull(request.getMinTotalPrice())){
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("totalPrice"), request.getMinTotalPrice()));
             }
 
-            // maximum unit price
+            // TODO filter by maximum unit price
             if (Objects.nonNull(request.getMaxUnitPrice())){
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("unitPrice"), request.getMaxUnitPrice()));
             }
 
-            // maximum total price
+            // TODO filter by maximum total price
             if (Objects.nonNull(request.getMaxTotalPrice())){
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("totalPrice"), request.getMaxTotalPrice()));
             }
@@ -114,9 +121,11 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
             return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
         };
 
+        // TODO create pageable
         Pageable pageable = PageRequest.of(page, size);
         Page<ProductSupplier> productSuppliers = productSupplierRepository.findAll(specification, pageable);
 
+        // TODO create product supplier response to list
         List<ProductSupplierResponse> responses = productSuppliers.stream().map(this::toProductSupplierResponse).toList();
 
         return new PageImpl<>(responses, pageable, productSuppliers.getTotalElements());
@@ -125,6 +134,7 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
     @Transactional(readOnly = true)
     @Override
     public ProductSupplierResponse getById(String id) {
+        // TODO get product supplier by id
         ProductSupplier productSupplier = productSupplierRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ResponseMessage.getNotFoundResource(ProductSupplier.class)));
@@ -135,13 +145,16 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public ProductSupplierResponse update(UpdateProductSupplierRequest request, String id) {
+        // TODO validate request
         validationUtil.validate(request);
 
         try {
+            // TODO get product supplier by id
             ProductSupplier productSupplier = productSupplierRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ResponseMessage.getNotFoundResource(ProductSupplier.class)));
 
+            // TODO if product supplier is present then update category
             String categoryString = request.getCategory();
             if (categoryString.isEmpty() || categoryString.isBlank()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
@@ -150,10 +163,12 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
 
             Category category = categoryService.getCategoryByCategory(categoryString.toUpperCase());
 
+            // TODO if product supplier is present then update product supplier
         if (productSupplier != null) {
             Integer totalItem = request.getTotalItem();
             BigDecimal unitPrice = request.getUnitPrice();
 
+            // TODO calculate total price
             BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(totalItem));
 
             productSupplier.setProductName(request.getProductName());
@@ -168,8 +183,10 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
             productSupplierRepository.save(productSupplier);
         }
 
+        // TODO return response of product supplier
             return toProductSupplierResponse(productSupplier);
         } catch (IllegalArgumentException e) {
+            // TODO throw exception
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
@@ -177,13 +194,31 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void delete(String id) {
+        // TODO get product supplier by id
         ProductSupplier productSupplier = productSupplierRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         ResponseMessage.getNotFoundResource(ProductSupplier.class)));
 
+        // TODO delete product supplier
         productSupplierRepository.delete(productSupplier);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public Page<ProductSupplierResponse> getAllProductSupplierByCategory(String category, Integer page, Integer size) {
+        // TODO create pageable
+        Pageable pageable = PageRequest.of(page, size);
+
+        // TODO get all product supplier by category
+        Page<ProductSupplier> productSuppliers = productSupplierRepository.findAllProductSupplierByCategory(category, pageable);
+
+        // TODO create product supplier response to list
+        List<ProductSupplierResponse> responses = productSuppliers.stream().map(this::toProductSupplierResponse).toList();
+
+        return new PageImpl<>(responses, pageable, productSuppliers.getTotalElements());
+    }
+
+    // TODO create product supplier response
     private ProductSupplierResponse toProductSupplierResponse(ProductSupplier productSupplier) {
         return ProductSupplierResponse.builder()
                 .productSupplierId(productSupplier.getId())
@@ -196,17 +231,5 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
                 .createdAt(productSupplier.getCreatedAt().toString())
                 .updatedAt(productSupplier.getUpdatedAt() != null ? productSupplier.getUpdatedAt().toString() : null)
                 .build();
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public Page<ProductSupplierResponse> getAllProductSupplierByCategory(String category, Integer page, Integer size) {
-        Pageable pageable = PageRequest.of(page, size);
-
-        Page<ProductSupplier> productSuppliers = productSupplierRepository.findAllProductSupplierByCategory(category, pageable);
-
-        List<ProductSupplierResponse> responses = productSuppliers.stream().map(this::toProductSupplierResponse).toList();
-
-        return new PageImpl<>(responses, pageable, productSuppliers.getTotalElements());
     }
 }

@@ -64,12 +64,12 @@ public class ProductStoreController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<?> getAllProductStores(@RequestParam(value = "productCode", required = false) String productCode,
-                                    @RequestParam(value = "productName", required = false) String productName,
-                                    @RequestParam(value = "purchasePrice", required = false) Integer purchasePrice,
-                                    @RequestParam(value = "minSellingPrice", required = false) Integer minSellingPrice,
-                                    @RequestParam(value = "maxSellingPrice", required = false) Integer maxSellingPrice,
-                                    @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-                                    @RequestParam(value = "size", required = false, defaultValue = "10") Integer size
+                                                 @RequestParam(value = "productName", required = false) String productName,
+                                                 @RequestParam(value = "purchasePrice", required = false) Integer purchasePrice,
+                                                 @RequestParam(value = "minSellingPrice", required = false) Integer minSellingPrice,
+                                                 @RequestParam(value = "maxSellingPrice", required = false) Integer maxSellingPrice,
+                                                 @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+                                                 @RequestParam(value = "size", required = false, defaultValue = "10") Integer size
                                     ) {
         SearchProductStoreRequest request = SearchProductStoreRequest.builder()
                 .productCode(productCode)

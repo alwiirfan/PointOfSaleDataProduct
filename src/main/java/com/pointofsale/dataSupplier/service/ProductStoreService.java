@@ -4,6 +4,7 @@ import com.pointofsale.dataSupplier.dto.request.NewProductStoreRequest;
 import com.pointofsale.dataSupplier.dto.request.SearchProductStoreRequest;
 import com.pointofsale.dataSupplier.dto.request.UpdateProductStoreRequest;
 import com.pointofsale.dataSupplier.dto.response.ProductStoreResponse;
+import com.pointofsale.dataSupplier.entity.ProductStore;
 
 import org.springframework.data.domain.Page;
 
@@ -14,6 +15,9 @@ public interface ProductStoreService {
     ProductStoreResponse getProductStoreByProductStoreCode(String productStoreCode);
     ProductStoreResponse updateProductStore(UpdateProductStoreRequest request, String id);
     void deleteProductStore(String id);
+
+    ProductStore getByProductCode(String productCode);
+    ProductStore updateProductStoreStock(Integer stock, String id);
 
     Page<ProductStoreResponse> getAllProductStoreByCategory(String category, Integer page, Integer size);
 }

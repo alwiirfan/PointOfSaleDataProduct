@@ -43,6 +43,7 @@ public class ProductStoreServiceImpl implements ProductStoreService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public ProductStoreResponse createProductStore(NewProductStoreRequest request) {
+        // TODO validate request
         validationUtil.validate(request);
         try {
             String categoryString = request.getProductCategory();
@@ -51,10 +52,13 @@ public class ProductStoreServiceImpl implements ProductStoreService {
                         ResponseMessage.getBadRequest(Category.class));
             }
 
+            // TODO get or add return of category
             Category category = categoryService.getCategoryByCategory(categoryString.toUpperCase());
 
+            // TODO generate random of product store code
             String productCode = randomUtil.generateRandomString(6);
 
+            // TODO create product store
             ProductStore productStore = ProductStore.builder()
                     .productCode(productCode)
                     .productName(request.getProductName())
@@ -73,9 +77,11 @@ public class ProductStoreServiceImpl implements ProductStoreService {
 
             productStoreRepository.saveAndFlush(productStore);
 
+            // TODO return response
             return toProductStoreResponse(productStore);
 
         }catch (IllegalArgumentException e){
+            // TODO throw exception
             throw new ResponseStatusException(HttpStatus.CONFLICT, 
                     ResponseMessage.getDuplicateResource(ProductStore.class));
         }
@@ -85,35 +91,36 @@ public class ProductStoreServiceImpl implements ProductStoreService {
     @Transactional(readOnly = true)
     @Override
     public Page<ProductStoreResponse> getAllProductStore(SearchProductStoreRequest request, Integer page, Integer size) {
+        // TODO create specification
         Specification<ProductStore> specification = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            // by product store code
+            // TODO filter by product store code
             if (Objects.nonNull(request.getProductCode())){
                 predicates.add(criteriaBuilder
                             .equal(root.get("productCode"), request.getProductCode()));
             }
 
-            // by product store name
+            // TODO filter by product store name
             if (Objects.nonNull(request.getProductName())){
                 predicates.add(criteriaBuilder
                             .like(criteriaBuilder.lower(root.get("productName")),
                                             "%" + request.getProductName().toLowerCase() + "%"));
             }
 
-            // by min selling price
+            // TODO filter by min selling price
             if (Objects.nonNull(request.getMinSellingPrice())){
                 predicates.add(criteriaBuilder
                             .greaterThanOrEqualTo(root.get("sellingPrice"), request.getMinSellingPrice()));
             }
 
-            // by max selling price
+            // TODO filter by max selling price
             if (Objects.nonNull(request.getMaxSellingPrice())){
                 predicates.add(criteriaBuilder
                             .lessThanOrEqualTo(root.get("sellingPrice"), request.getMaxSellingPrice()));
             }
 
-            // by purchase price
+            // TODO filter by purchase price
             if (Objects.nonNull(request.getPurchasePrice())){
                 predicates.add(criteriaBuilder
                             .greaterThanOrEqualTo(root.get("purchasePrice"), request.getPurchasePrice()));
@@ -122,10 +129,13 @@ public class ProductStoreServiceImpl implements ProductStoreService {
             return query.where(predicates.toArray(new Predicate[]{})).getRestriction();
         };
 
+        // TODO create pageable
         Pageable pageable = PageRequest.of(page, size);
         
+        // TODO get all product store
         Page<ProductStore> productStores = productStoreRepository.findAll(specification, pageable);
 
+        // TODO map responses to list
         List<ProductStoreResponse> responses = productStores.stream().map(productStore -> {
             return toProductStoreResponse(productStore);
         }).collect(Collectors.toList());
@@ -136,24 +146,29 @@ public class ProductStoreServiceImpl implements ProductStoreService {
     @Transactional(readOnly = true)
     @Override
     public ProductStoreResponse getProductStoreByProductStoreCode(String productStoreCode) {
+        // TODO get product store by product store code
         ProductStore productStore = productStoreRepository.findFirstByProductCode(productStoreCode)
                                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                             ResponseMessage.getNotFoundResource(ProductStore.class)));
 
+        // TODO return response
         return toProductStoreResponse(productStore);
     }
 
     @Transactional(readOnly = true)
     @Override
     public ProductStoreResponse getProductStoreById(String id) {
+        // TODO get product store by id
         ProductStore productStore = productStoreRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                             ResponseMessage.getNotFoundResource(ProductStore.class)));
 
+        // TODO return response
         return toProductStoreResponse(productStore);
     }
 
     private ProductStore findByIdOrThrowNotFound(String id) {
+        // TODO get product store by id or else return not found
         return productStoreRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
                             ResponseMessage.getNotFoundResource(ProductStore.class)));
@@ -162,6 +177,7 @@ public class ProductStoreServiceImpl implements ProductStoreService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public ProductStoreResponse updateProductStore(UpdateProductStoreRequest request, String id) {
+        // TODO validate request
         validationUtil.validate(request);
 
         try {
@@ -171,10 +187,13 @@ public class ProductStoreServiceImpl implements ProductStoreService {
                             ResponseMessage.getBadRequest(Category.class));
             }
 
+            // TODO get or add return of category
             Category category = categoryService.getCategoryByCategory(categoryString.toUpperCase());
 
+            // TODO get product store by id
             ProductStore productStore = findByIdOrThrowNotFound(id);
             
+            // TODO update product store
             productStore.setProductName(request.getProductName());
             productStore.setCategory(category);
             productStore.setDescription(request.getDescription());
@@ -189,8 +208,11 @@ public class ProductStoreServiceImpl implements ProductStoreService {
             productStore.setUpdatedAt(new Date());
 
             productStoreRepository.save(productStore);
+
+            // TODO return response
             return toProductStoreResponse(productStore);
         } catch (IllegalArgumentException e) {
+            // TODO throw exception
             throw new ResponseStatusException(HttpStatus.CONFLICT, 
                     ResponseMessage.getDuplicateResource(ProductStore.class));
         }
@@ -199,10 +221,53 @@ public class ProductStoreServiceImpl implements ProductStoreService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteProductStore(String id) {
+        // TODO get product store by id
         ProductStore productStore = findByIdOrThrowNotFound(id);
+
+        // TODO delete product store
         productStoreRepository.delete(productStore);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public Page<ProductStoreResponse> getAllProductStoreByCategory(String category, Integer page, Integer size) {
+        // TODO create pageable
+        Pageable pageable = PageRequest.of(page, size);
+
+        // TODO get all product store by category
+        Page<ProductStore> productStores = productStoreRepository.findAllProductStoreByCategory(category.toUpperCase(), pageable);
+
+        // TODO map responses to list
+        List<ProductStoreResponse> responses = productStores.stream().map(this::toProductStoreResponse).collect(Collectors.toList());
+
+        return new PageImpl<>(responses, pageable, productStores.getTotalElements());
+    }
+
+    @Override
+    public ProductStore getByProductCode(String productCode) {
+        // TODO get product store by product code or else return not found
+        return productStoreRepository.findFirstByProductCode(productCode).orElseThrow(() -> 
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, 
+                                ResponseMessage.getNotFoundResource(ProductStore.class)));
+    }
+
+    @Override
+    public ProductStore updateProductStoreStock(Integer stock, String id) {
+        // TODO get product store by id
+        ProductStore productStore = findByIdOrThrowNotFound(id);
+
+        // TODO update product store stock
+        ProductPrice productPrice = productStore.getProductPrice();
+
+        productPrice.setStock(stock);
+
+        productStore.setUpdatedAt(new Date());
+
+        // TODO save product store
+        return productStoreRepository.save(productStore);
+    }
+
+    // TODO create product store response
     private ProductStoreResponse toProductStoreResponse(ProductStore productStore) {
         return ProductStoreResponse.builder()
                 .productStoreId(productStore.getId())
@@ -220,15 +285,4 @@ public class ProductStoreServiceImpl implements ProductStoreService {
                 .build();
     }
 
-    @Transactional(readOnly = true)
-    @Override
-    public Page<ProductStoreResponse> getAllProductStoreByCategory(String category, Integer page, Integer size) {
-        Pageable pageable = PageRequest.of(page, size);
-
-        Page<ProductStore> productStores = productStoreRepository.findAllProductStoreByCategory(category.toUpperCase(), pageable);
-
-        List<ProductStoreResponse> responses = productStores.stream().map(this::toProductStoreResponse).collect(Collectors.toList());
-
-        return new PageImpl<>(responses, pageable, productStores.getTotalElements());
-    }
 }

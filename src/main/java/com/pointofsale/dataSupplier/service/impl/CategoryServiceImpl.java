@@ -34,6 +34,7 @@ import org.springframework.web.server.ResponseStatusException;
         @Transactional(rollbackFor = Exception.class)
         @Override
         public CategoryResponse saveCategory(NewCategoryRequest request) {
+            // TODO validate request
             validationUtil.validate(request);
             try {
                 Category category = Category.builder()
@@ -44,15 +45,18 @@ import org.springframework.web.server.ResponseStatusException;
 
                 categoryRepository.save(category);
 
+                // TODO return category response
                 return toCategoryResponse(category);
             } catch (IllegalArgumentException e) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ResponseMessage.getInternalServerError(Category.class), e);
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, 
+                        ResponseMessage.getInternalServerError(Category.class), e);
             }
         }
 
     
     @Override
     public Category getCategoryByCategory(String category) {
+        // TODO get category by category
         return categoryRepository
                 .findFirstByCategory(category)
                 .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -63,9 +67,11 @@ import org.springframework.web.server.ResponseStatusException;
     @Transactional(readOnly = true)
     @Override
     public Page<CategoryResponse> findAllCategories(String category, Integer page, Integer size) {
+        // TODO create specification 
         Specification<Category> specification = (root, query, criteriaBuilder) -> {
             List<Predicate> predicateList = new ArrayList<>();
 
+            // TODO filter by category
             if (Objects.nonNull(category)) {
                 predicateList.add(criteriaBuilder.equal(root.get("category"), "%" + category + "%"));
             }
@@ -73,10 +79,13 @@ import org.springframework.web.server.ResponseStatusException;
             return query.where(predicateList.toArray(new Predicate[]{})).getRestriction();
             };
 
+        // TODO create pageable
         Pageable pageable = PageRequest.of(page, size);
         
+        // TODO get all categories
         Page<Category> categories = categoryRepository.findAll(specification, pageable);
 
+        // TODO map category responses to list
         List<CategoryResponse> categoryList = categories.stream().map(this::toCategoryResponse).collect(Collectors.toList());
         
         return new PageImpl<>(categoryList, pageable, categories.getTotalElements());
@@ -85,13 +94,16 @@ import org.springframework.web.server.ResponseStatusException;
     @Transactional(rollbackFor = Exception.class)
     @Override
     public CategoryResponse updateCategory(String id, NewCategoryRequest request) {
+        // TODO validate request
         validationUtil.validate(request);
 
         try {
+            // TODO get category by id
             Category category = categoryRepository.findById(id)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
                             ResponseMessage.getNotFoundResource(Category.class)));
 
+            // TODO update category
             String categoryString = request.getCategory();
             if (categoryString.isEmpty() || categoryString.isBlank()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
@@ -103,12 +115,26 @@ import org.springframework.web.server.ResponseStatusException;
 
             categoryRepository.save(category);
 
+            // TODO return category response
             return toCategoryResponse(category);
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ResponseMessage.getInternalServerError(Category.class), e);
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void deleteCategory(String id) {
+        // TODO get category by id
+        Category category = categoryRepository.findById(id)
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
+                                        ResponseMessage.getNotFoundResource(Category.class)));
+
+        // TODO delete category
+        categoryRepository.delete(category);
+    }
+
+    // TODO create category response
     private CategoryResponse toCategoryResponse(Category category) {
         return CategoryResponse.builder()
                                 .categoryId(category.getId())
@@ -116,16 +142,6 @@ import org.springframework.web.server.ResponseStatusException;
                                 .createdAt(category.getCreatedAt().toString())
                                 .updatedAt(category.getUpdatedAt() != null ? category.getUpdatedAt().toString() : null)
                                 .build();
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    @Override
-    public void deleteCategory(String id) {
-        Category category = categoryRepository.findById(id)
-                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
-                                        ResponseMessage.getNotFoundResource(Category.class)));
-
-        categoryRepository.delete(category);
     }
 
 }
