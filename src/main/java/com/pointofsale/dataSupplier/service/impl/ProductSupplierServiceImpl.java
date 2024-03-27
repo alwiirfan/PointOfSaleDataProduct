@@ -24,8 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -69,7 +69,7 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
                     .merk(request.getMerk())
                     .build();
 
-            productSupplier.setCreatedAt(new Date());
+            productSupplier.setCreatedAt(LocalDateTime.now());
 
             productSupplierRepository.save(productSupplier);
 
@@ -178,7 +178,7 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
             productSupplier.setTotalPrice(totalPrice);
             productSupplier.setMerk(request.getMerk());
 
-            productSupplier.setUpdatedAt(new Date());
+            productSupplier.setUpdatedAt(LocalDateTime.now());
 
             productSupplierRepository.save(productSupplier);
         }

@@ -17,6 +17,7 @@ import com.pointofsale.dataSupplier.util.ValidationUtil;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -73,7 +74,7 @@ public class ProductStoreServiceImpl implements ProductStoreService {
                     .merk(request.getMerk())
                     .build();
 
-            productStore.setCreatedAt(new Date());
+            productStore.setCreatedAt(LocalDateTime.now());
 
             productStoreRepository.saveAndFlush(productStore);
 
@@ -205,7 +206,7 @@ public class ProductStoreServiceImpl implements ProductStoreService {
                     .isActive(request.getIsActive())
                     .build());
 
-            productStore.setUpdatedAt(new Date());
+            productStore.setUpdatedAt(LocalDateTime.now());
 
             productStoreRepository.save(productStore);
 
@@ -261,7 +262,7 @@ public class ProductStoreServiceImpl implements ProductStoreService {
 
         productPrice.setStock(stock);
 
-        productStore.setUpdatedAt(new Date());
+        productStore.setUpdatedAt(LocalDateTime.now());
 
         // TODO save product store
         return productStoreRepository.save(productStore);

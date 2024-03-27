@@ -11,6 +11,7 @@ import com.pointofsale.dataSupplier.util.ValidationUtil;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,7 @@ import org.springframework.web.server.ResponseStatusException;
                         .category(request.getCategory().toUpperCase())
                         .build();
 
-                category.setCreatedAt(new Date());
+                category.setCreatedAt(LocalDateTime.now());
 
                 categoryRepository.save(category);
 
@@ -111,7 +112,7 @@ import org.springframework.web.server.ResponseStatusException;
             }
 
             category.setCategory(categoryString.toUpperCase());
-            category.setUpdatedAt(new Date());
+            category.setUpdatedAt(LocalDateTime.now());
 
             categoryRepository.save(category);
 

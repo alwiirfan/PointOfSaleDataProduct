@@ -11,11 +11,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Objects;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.function.Function;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import com.pointofsale.dataSupplier.constant.ETransactionType;
 import com.pointofsale.dataSupplier.constant.ResponseMessage;
@@ -23,6 +26,8 @@ import com.pointofsale.dataSupplier.dto.request.NewTransactionDetailRequest;
 import com.pointofsale.dataSupplier.dto.request.NewTransactionRequest;
 import com.pointofsale.dataSupplier.dto.request.SearchSalesHistoryRequest;
 import com.pointofsale.dataSupplier.dto.request.SearchTransactionRequest;
+import com.pointofsale.dataSupplier.dto.request.UpdateTransactionRequest;
+import com.pointofsale.dataSupplier.dto.request.UpdateTransactionDetailRequest;
 import com.pointofsale.dataSupplier.dto.response.ProductStoreResponse;
 import com.pointofsale.dataSupplier.dto.response.TotalSales;
 import com.pointofsale.dataSupplier.dto.response.TransactionDetailResponse;
@@ -67,22 +72,12 @@ public class TransactionServiceImpl implements TransactionService {
                         ResponseMessage.getBadRequest(ProductStore.class));
             }
 
-            Integer oldStock = productStore.getProductPrice().getStock();
-
-            // TODO check stock in product store
-            if (oldStock < detailRequest.getTotalItem()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stock not enough");
-            }
-
             // TODO update stock if stock is enough
-            Integer newStock = oldStock - detailRequest.getTotalItem();
+            Integer newStock = newStock(productStore, detailRequest.getTotalItem());
             productStoreService.updateProductStoreStock(newStock, productStore.getId());
             
             // TODO calculate total price
-            BigDecimal unitPrice = productStore.getProductPrice().getSellingPrice();
-            Integer totalItem = detailRequest.getTotalItem();
-
-            BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(totalItem));
+            BigDecimal totalPrice = calculateTotalPrice(productStore, detailRequest.getTotalItem());
 
             // TODO create transaction detail based on request
             TransactionDetail transactionDetail = TransactionDetail.builder()
@@ -91,7 +86,7 @@ public class TransactionServiceImpl implements TransactionService {
                                 .totalPrice(totalPrice)
                                 .build();
 
-            transactionDetail.setCreatedAt(new Date());
+            transactionDetail.setCreatedAt(LocalDateTime.now());
 
             transactionDetails.add(transactionDetail);
         }
@@ -100,7 +95,7 @@ public class TransactionServiceImpl implements TransactionService {
         ETransactionType eType = ETransactionType.valueOf(request.getTransactionType().toUpperCase());
         TransactionType transactionType = transactionTypeService.getOrSave(eType);
 
-        transactionType.setCreatedAt(new Date());
+        transactionType.setCreatedAt(LocalDateTime.now());
 
         // TODO create transaction and add to transaction details
         Transaction transaction = Transaction.builder()
@@ -109,7 +104,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .transactionDetails(transactionDetails)
                 .build();
 
-        transaction.setCreatedAt(new Date());
+        transaction.setCreatedAt(LocalDateTime.now());
 
         // TODO save transaction
         transactionRepository.saveAndFlush(transaction);
@@ -123,6 +118,24 @@ public class TransactionServiceImpl implements TransactionService {
         return toTransactionResponse(transaction);
     }
 
+    private Integer newStock(ProductStore productStore, Integer totalItem) {
+        Integer oldStock = productStore.getProductPrice().getStock();
+
+        if (oldStock < totalItem) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stock not enough");
+        }
+
+        Integer newStock = oldStock - totalItem;
+        return newStock;
+    }
+
+    private BigDecimal calculateTotalPrice(ProductStore productStore, Integer totalItem) {
+        BigDecimal unitPrice = productStore.getProductPrice().getSellingPrice();
+
+        BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(totalItem));
+        return totalPrice;
+    }
+
     @Transactional(readOnly = true)
     @Override
     public TransactionResponse get(String transactionId) {
@@ -132,6 +145,98 @@ public class TransactionServiceImpl implements TransactionService {
                         ResponseMessage.getNotFoundResource(Transaction.class)));
         
         return toTransactionResponse(transaction);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public TransactionResponse update(UpdateTransactionRequest request, String id) {
+        // TODO validate request
+        validationUtil.validate(request);
+        
+        // TODO get transaction by id
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        ResponseMessage.getNotFoundResource(Transaction.class)));
+
+        // TODO check date is now 
+        if (!checkDate(transaction.getTransactionDate())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Transaction can't be update");
+        }
+
+        // TODO create map of detail request
+        Map<String, UpdateTransactionDetailRequest> detailRequestMap = request.getTransactionDetails().stream()
+                .collect(Collectors.toMap(UpdateTransactionDetailRequest::getTransactionDetailId, Function.identity()));
+
+        // TODO get transaction details
+        List<TransactionDetail> transactionDetails = transaction.getTransactionDetails();
+
+        // TODO update transaction details using foreach
+            for (TransactionDetail transactionDetail : transactionDetails) {
+                String transactionDetailId = transactionDetail.getId();
+                
+                // TODO check detail request exist in detail request
+                if (detailRequestMap.containsKey(transactionDetailId)) {
+                    UpdateTransactionDetailRequest detailRequest = detailRequestMap.get(transactionDetailId);
+
+                    // TODO get product store by product store code
+                    ProductStore productStore = productStoreService.getByProductCode(detailRequest.getProductCode());
+
+                    // TODO Rollback stock change based on previous total item
+                    rollbackStockChange(transactionDetail);
+
+                    // TODO Update stock to new total item
+                    if (detailRequest.getNewTotalItem() != null) {
+                        Integer newStock = newStock(productStore, detailRequest.getNewTotalItem());
+                        productStoreService.updateProductStoreStock(newStock, productStore.getId());
+                    }
+
+                    // TODO Calculate new total price
+                    BigDecimal newTotalPrice = calculateTotalPrice(productStore, detailRequest.getNewTotalItem());
+
+                    // TODO Update transaction detail
+                    transactionDetail.setTotalItem(detailRequest.getNewTotalItem());
+                    transactionDetail.setTotalPrice(newTotalPrice);
+                    transactionDetail.setUpdatedAt(LocalDateTime.now());
+                }
+            }
+
+        // TODO create transaction type based on transaction type
+        ETransactionType eType = ETransactionType.valueOf(request.getTransactionType().toUpperCase());
+        TransactionType transactionType = transactionTypeService.getOrSave(eType);
+        transactionType.setCreatedAt(LocalDateTime.now());
+
+        // TODO create transaction and add to transaction details
+        transaction.setTransactionType(transactionType);
+        transaction.setTransactionDate(LocalDateTime.now());
+        transaction.setTransactionDetails(transactionDetails);
+        transaction.setUpdatedAt(LocalDateTime.now());
+
+        // TODO save transaction
+        transactionRepository.saveAndFlush(transaction);
+
+        // TODO add transaction to transaction detail
+        for (TransactionDetail transactionDetail : transactionDetails) {
+            transactionDetail.setTransaction(transaction);
+        }
+
+        // TODO return transaction response
+        return toTransactionResponse(transaction);
+
+    }
+
+    private void rollbackStockChange(TransactionDetail transactionDetail) {
+        ProductStore productStore = transactionDetail.getProductStore();
+        Integer previousStock = productStore.getProductPrice().getStock();
+        Integer currentStock = previousStock + transactionDetail.getTotalItem();
+        productStoreService.updateProductStoreStock(currentStock, productStore.getId());
+    }
+
+    private Boolean checkDate(LocalDateTime transactionDateFromDatabase) {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate dateFromDatabase = transactionDateFromDatabase.toLocalDate();
+
+        return currentDate.equals(dateFromDatabase);
     }
 
     @Transactional(readOnly = true)
@@ -253,4 +358,5 @@ public class TransactionServiceImpl implements TransactionService {
                 .createdAt(transaction.getCreatedAt().toString())
                 .build();
     }
+
 }

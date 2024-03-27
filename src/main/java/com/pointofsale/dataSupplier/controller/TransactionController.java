@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pointofsale.dataSupplier.dto.request.NewTransactionRequest;
 import com.pointofsale.dataSupplier.dto.request.SearchSalesHistoryRequest;
 import com.pointofsale.dataSupplier.dto.request.SearchTransactionRequest;
+import com.pointofsale.dataSupplier.dto.request.UpdateTransactionRequest;
 import com.pointofsale.dataSupplier.dto.response.CommonResponse;
 import com.pointofsale.dataSupplier.dto.response.PaginationResponse;
 import com.pointofsale.dataSupplier.dto.response.TotalSales;
@@ -57,6 +59,23 @@ public class TransactionController {
         CommonResponse<?> response = CommonResponse.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Get transaction by id successfully")
+                .data(transactionResponse)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping(
+        path = "/{id}",
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<?> updateTransaction(@RequestBody UpdateTransactionRequest request, @PathVariable("id") String id) {
+        TransactionResponse transactionResponse = transactionService.update(request, id);
+
+        CommonResponse<?> response = CommonResponse.builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Successfully update transaction")
                 .data(transactionResponse)
                 .build();
 
