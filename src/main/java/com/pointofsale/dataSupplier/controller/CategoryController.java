@@ -10,6 +10,7 @@ import com.pointofsale.dataSupplier.dto.response.PaginationResponse;
 import com.pointofsale.dataSupplier.service.CategoryService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,7 +43,7 @@ public class CategoryController {
     @Operation(summary = "Create category", description = "Create category")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Successfully created category", 
-                content = @Content(schema = @Schema(implementation = CommonResponse.class))),
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CommonResponse.class))),
     })
     @PostMapping(
         produces = MediaType.APPLICATION_JSON_VALUE,
@@ -92,12 +93,18 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Update category", description = "Update category")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Update category successfully", 
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CommonResponse.class)) }),
+        @ApiResponse(responseCode = "404", description = "Category not found", content = @Content)
+    })
     @PutMapping(
         path = "/{id}",
         produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> updateCategory(@RequestBody NewCategoryRequest request, @PathVariable("id") String id) {
+    public ResponseEntity<?> updateCategory(@RequestBody NewCategoryRequest request,@Parameter(description = "ID of category to be retrieved", required = true) @PathVariable("id") String id) {
         CategoryResponse category = categoryService.updateCategory(id, request);
         CommonResponse<?> response = CommonResponse.builder()
                 .statusCode(HttpStatus.OK.value())
@@ -107,11 +114,17 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
     
+    @Operation(summary = "Delete category", description = "Delete category")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Delete category successfully", 
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CommonResponse.class)) }),
+        @ApiResponse(responseCode = "404", description = "Category not found", content = @Content)
+    })
     @DeleteMapping(
         path = "/{id}",
         produces = MediaType.APPLICATION_JSON_VALUE
         )
-    public ResponseEntity<?> deleteCategory(@PathVariable("id") String id) {
+    public ResponseEntity<?> deleteCategory(@Parameter(description = "ID of category to be retrieved", required = true) @PathVariable("id") String id) {
         categoryService.deleteCategory(id);
         CommonResponse<?> response = CommonResponse.builder()
                 .statusCode(HttpStatus.OK.value())

@@ -21,7 +21,7 @@ public class OpenAPIConfiguration {
         Info info = new Info()
             .title("Product Management System about Point of Sale")
             .version("1.0")
-            .description("This API exposes end point to manage Product Supplier and Product Store");
+            .description("This API exposes end point to manage products and sales");
             
         return new OpenAPI()
                 .info(info)

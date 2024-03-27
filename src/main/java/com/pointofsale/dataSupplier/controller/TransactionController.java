@@ -23,14 +23,27 @@ import com.pointofsale.dataSupplier.dto.response.TotalSales;
 import com.pointofsale.dataSupplier.dto.response.TransactionResponse;
 import com.pointofsale.dataSupplier.service.TransactionService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/transaction")
+@Tag(name = "TRANSACTION", description = "methods of Transaction APIs")
 public class TransactionController {
     private final TransactionService transactionService;
 
+    @Operation(summary = "Create transaction", description = "Create transaction")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Successfully created transaction", 
+                content = @Content(schema = @Schema(implementation = CommonResponse.class))),
+    })
     @PostMapping(
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
@@ -49,11 +62,17 @@ public class TransactionController {
                 .body(response);
     }
 
+    @Operation(summary = "Get transaction by id", description = "Get transaction by id")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Get transaction by id successfully", 
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE ,schema = @Schema(implementation = CommonResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Transaction not found", content = @Content)
+    })
     @GetMapping(
         path = "/{id}",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> getTransactionById(@PathVariable("id") String id) {
+    public ResponseEntity<?> getTransactionById(@Parameter(description = "ID of transaction to be retrieved", required = true) @PathVariable("id") String id) {
         TransactionResponse transactionResponse = transactionService.get(id);
 
         CommonResponse<?> response = CommonResponse.builder()
@@ -65,12 +84,18 @@ public class TransactionController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Update transaction", description = "Update transaction")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Update transaction successfully", 
+                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CommonResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Transaction not found", content = @Content)
+    })
     @PutMapping(
         path = "/{id}",
         produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> updateTransaction(@RequestBody UpdateTransactionRequest request, @PathVariable("id") String id) {
+    public ResponseEntity<?> updateTransaction(@RequestBody UpdateTransactionRequest request,@Parameter(description = "ID of transaction to be retrieved", required = true) @PathVariable("id") String id) {
         TransactionResponse transactionResponse = transactionService.update(request, id);
 
         CommonResponse<?> response = CommonResponse.builder()
@@ -82,6 +107,11 @@ public class TransactionController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Get all transactions", description = "Get all transactions")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Get all transactions successfully", 
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CommonResponse.class)) }),
+    })
     @GetMapping(
         produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -120,6 +150,11 @@ public class TransactionController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Get total sales", description = "Get total sales")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Get total sales successfully", 
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CommonResponse.class)) }),
+    })
     @GetMapping(
         path = "/total-sales",
         produces = MediaType.APPLICATION_JSON_VALUE

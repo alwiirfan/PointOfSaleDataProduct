@@ -356,6 +356,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .transactionDate(transaction.getTransactionDate().toString())
                 .transactionDetails(transactionDetailResponses)
                 .createdAt(transaction.getCreatedAt().toString())
+                .updatedAt(transaction.getUpdatedAt() != null ? transaction.getUpdatedAt().toString() : null)
                 .build();
     }
 

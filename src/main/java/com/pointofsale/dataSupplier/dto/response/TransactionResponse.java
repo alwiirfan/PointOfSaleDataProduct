@@ -17,4 +17,5 @@ public class TransactionResponse {
     private String transactionType;
     private List<TransactionDetailResponse> transactionDetails;
     private String createdAt;
+    private String updatedAt;
 }
