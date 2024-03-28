@@ -333,7 +333,6 @@ public class TransactionServiceImpl implements TransactionService {
                     .productPurchasePrice(productStore.getProductPrice().getPurchasePrice())
                     .productSellingPrice(productStore.getProductPrice().getSellingPrice())
                     .productStock(productStore.getProductPrice().getStock())
-                    .isActive(productStore.getProductPrice().getIsActive())
                     .createdAt(productStore.getCreatedAt().toString())
                     .updatedAt(productStore.getUpdatedAt() != null ? productStore.getUpdatedAt().toString() : null)
                     .build();
@@ -354,9 +353,9 @@ public class TransactionServiceImpl implements TransactionService {
                 .transactionId(transaction.getId())
                 .transactionType(transaction.getTransactionType().getTransactionType().name())
                 .transactionDate(transaction.getTransactionDate().toString())
-                .transactionDetails(transactionDetailResponses)
                 .createdAt(transaction.getCreatedAt().toString())
                 .updatedAt(transaction.getUpdatedAt() != null ? transaction.getUpdatedAt().toString() : null)
+                .transactionDetails(transactionDetailResponses)
                 .build();
     }
 

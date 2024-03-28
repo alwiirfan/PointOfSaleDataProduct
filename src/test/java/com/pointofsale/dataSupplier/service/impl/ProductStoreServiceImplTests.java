@@ -57,7 +57,7 @@ public class ProductStoreServiceImplTests {
         dummyProductPrice.setPurchasePrice(dummyRequest.getPurchasePrice());
         dummyProductPrice.setSellingPrice(dummyRequest.getSellingPrice());
         dummyProductPrice.setStock(dummyRequest.getProductStock());
-        dummyProductPrice.setIsActive(true);
+        // dummyProductPrice.setIsActive(true);
 
         // dummy product store
         ProductStore dummyProductStore = new ProductStore();
@@ -155,7 +155,7 @@ public class ProductStoreServiceImplTests {
             dummyProductPrice.setPurchasePrice(new BigDecimal(100.00));
             dummyProductPrice.setSellingPrice(new BigDecimal(200.00));
             dummyProductPrice.setStock(10);
-            dummyProductPrice.setIsActive(true);
+            // dummyProductPrice.setIsActive(true);
 
 
             // dummy product store
@@ -194,7 +194,7 @@ public class ProductStoreServiceImplTests {
             dummyProductPrice.setPurchasePrice(new BigDecimal(100.00));
             dummyProductPrice.setSellingPrice(new BigDecimal(200.00));
             dummyProductPrice.setStock(10);
-            dummyProductPrice.setIsActive(true);
+            // dummyProductPrice.setIsActive(true);
 
 
             // dummy product store
@@ -284,7 +284,7 @@ public class ProductStoreServiceImplTests {
             dummyProductPrice.setSellingPrice(dummyRequest.getSellingPrice());
             // dummyProductPrice.setProductStore(dummyProductStore);
             dummyProductPrice.setStock(dummyRequest.getProductStock());
-            dummyProductPrice.setIsActive(true);
+            // dummyProductPrice.setIsActive(true);
 
             // mock behavior
             // when(productPriceService.getActivePriceByProductStoreId(dummyProductStore.getId())).thenReturn(dummyProductPrice);
@@ -349,7 +349,7 @@ public class ProductStoreServiceImplTests {
             // dummyProductPrice.setSellingPrice(dummyRequest.getSellingPrice());
             // dummyProductPrice.setProductStore(null);
             dummyProductPrice.setStock(dummyRequest.getProductStock());
-            dummyProductPrice.setIsActive(true);
+            // dummyProductPrice.setIsActive(true);
 
             // mock behavior
             // when(productPriceService.getActivePriceByProductStoreId(dummyProductStore.getId())).thenReturn(dummyProductPrice);

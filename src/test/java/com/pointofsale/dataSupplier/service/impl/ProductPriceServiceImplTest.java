@@ -104,7 +104,7 @@ public class ProductPriceServiceImplTest {
         dummyProductPrice.setPurchasePrice(new BigDecimal(100.00));
         dummyProductPrice.setSellingPrice(new BigDecimal(200.00));
         // dummyProductPrice.setProductStore(dummyProductStore);
-        dummyProductPrice.setIsActive(true);
+        // dummyProductPrice.setIsActive(true);
 
         // mock behavior
         // when(productPriceRepository.findFirstByIsActiveTrueAndProductStore_Id(productStoreId)).thenReturn(Optional.empty());
@@ -176,7 +176,7 @@ public class ProductPriceServiceImplTest {
         dummyProductPrice.setPurchasePrice(new BigDecimal(100.00));
         dummyProductPrice.setSellingPrice(new BigDecimal(200.00));
         // dummyProductPrice.setProductStore(dummyProductStore);
-        dummyProductPrice.setIsActive(true);
+        // dummyProductPrice.setIsActive(true);
 
         // mock behavior
         // when(productPriceRepository.findFirstByIsActiveTrueAndProductStore_ProductCode(productStoreCode)).thenReturn(Optional.of(dummyProductPrice));

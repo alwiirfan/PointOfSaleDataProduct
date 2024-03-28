@@ -36,7 +36,7 @@ public class ProductPriceRepositoryTests {
         .purchasePrice(new BigDecimal(100.00))
         .sellingPrice(new BigDecimal(200.00))
         // .productStore(dummyProductStore)
-        .isActive(true)
+        // .isActive(true)
         .build();
 
         // Act
@@ -80,7 +80,7 @@ public class ProductPriceRepositoryTests {
         .purchasePrice(new BigDecimal(100.00))
         .sellingPrice(new BigDecimal(200.00))
         // .productStore(dummyProductStore)
-        .isActive(true)
+        // .isActive(true)
         .build();
 
         // Act
@@ -97,7 +97,7 @@ public class ProductPriceRepositoryTests {
         .purchasePrice(new BigDecimal(100.00))
         .sellingPrice(new BigDecimal(200.00))
         // .productStore(new ProductStore())
-        .isActive(true)
+        // .isActive(true)
         .build();
 
         // Act

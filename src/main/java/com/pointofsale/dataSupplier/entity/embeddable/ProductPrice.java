@@ -21,7 +21,4 @@ public class ProductPrice {
 
     @Column(nullable = false, columnDefinition = "int check (stock > 0)")
     private Integer stock;
-
-    @Column(name = "is_active")
-    private Boolean isActive;
 }

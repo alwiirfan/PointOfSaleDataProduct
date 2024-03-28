@@ -33,4 +33,6 @@ public class ProductStore extends BaseEntity {
     @Embedded
     private ProductPrice productPrice;
 
+    @OneToOne(mappedBy = "productStore", cascade = CascadeType.PERSIST)
+    private ProductStoreExpiration productStoreExpiration;
 }
