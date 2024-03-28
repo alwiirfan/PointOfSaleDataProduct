@@ -65,6 +65,8 @@ public class ProductStoreController {
     )
     public ResponseEntity<?> getAllProductStores(@RequestParam(value = "productCode", required = false) String productCode,
                                                  @RequestParam(value = "productName", required = false) String productName,
+                                                 @RequestParam(value = "category", required = false) String category,
+                                                 @RequestParam(value = "merk", required = false) String merk,
                                                  @RequestParam(value = "purchasePrice", required = false) Integer purchasePrice,
                                                  @RequestParam(value = "minSellingPrice", required = false) Integer minSellingPrice,
                                                  @RequestParam(value = "maxSellingPrice", required = false) Integer maxSellingPrice,
@@ -74,6 +76,8 @@ public class ProductStoreController {
         SearchProductStoreRequest request = SearchProductStoreRequest.builder()
                 .productCode(productCode)
                 .productName(productName)
+                .Category(category)
+                .merk(merk)
                 .purchasePrice(purchasePrice)
                 .minSellingPrice(minSellingPrice)
                 .maxSellingPrice(maxSellingPrice)
@@ -166,29 +170,4 @@ public class ProductStoreController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary ="Get all product store by category", description = "GET methods of Product Store APIs")
-    @GetMapping( 
-            path = "/category",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<?> getAllProductStoreByCategory(@Parameter(description = "Category of product store to be retrieved", required = true)
-                                                                        @RequestParam( value = "category") String category,
-                                                            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-                                                            @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
-        Page<ProductStoreResponse> responsePage = productStoreService.getAllProductStoreByCategory(category, page, size);
-
-        CommonResponse<?> response = CommonResponse.builder()
-                .statusCode(HttpStatus.OK.value())
-                .message("Get all products in store successfully")
-                .data(responsePage.getContent())
-                .pagination(PaginationResponse.builder()
-                        .count(responsePage.getTotalElements())
-                        .totalPage(responsePage.getTotalPages())
-                        .page(responsePage.getNumberOfElements())
-                        .size(responsePage.getSize())
-                        .build())
-                .build();
-
-        return ResponseEntity.ok(response);
-    }
 }

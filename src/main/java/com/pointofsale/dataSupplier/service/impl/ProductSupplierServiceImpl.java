@@ -90,7 +90,21 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
 
             // TODO filter by product supplier name
             if (Objects.nonNull(request.getProductName())){
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("productName")), "%" +request.getProductName().toUpperCase()+ "%"));
+                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("productName")), 
+                        "%" +request.getProductName().toUpperCase()+ "%"));
+            }
+
+            // TODO filter by category
+            if (Objects.nonNull(request.getCategory())){
+                predicates.add(criteriaBuilder
+                            .like(criteriaBuilder.upper(root.join("category").get("category")),
+                                     "%" + request.getCategory().toUpperCase() + "%"));
+            }
+
+            // TODO filter by merk
+            if (Objects.nonNull(request.getMerk())) {
+                predicates.add(criteriaBuilder
+                            .equal(criteriaBuilder.lower(root.get("merk")), request.getMerk().toLowerCase()));
             }
 
             // TODO filter by total item
@@ -201,21 +215,6 @@ public class ProductSupplierServiceImpl implements ProductSupplierService {
 
         // TODO delete product supplier
         productSupplierRepository.delete(productSupplier);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public Page<ProductSupplierResponse> getAllProductSupplierByCategory(String category, Integer page, Integer size) {
-        // TODO create pageable
-        Pageable pageable = PageRequest.of(page, size);
-
-        // TODO get all product supplier by category
-        Page<ProductSupplier> productSuppliers = productSupplierRepository.findAllProductSupplierByCategory(category, pageable);
-
-        // TODO create product supplier response to list
-        List<ProductSupplierResponse> responses = productSuppliers.stream().map(this::toProductSupplierResponse).toList();
-
-        return new PageImpl<>(responses, pageable, productSuppliers.getTotalElements());
     }
 
     // TODO create product supplier response

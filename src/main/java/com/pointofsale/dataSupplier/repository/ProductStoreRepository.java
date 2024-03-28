@@ -8,8 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,7 +20,4 @@ public interface ProductStoreRepository extends JpaRepository<ProductStore, Stri
     Optional<ProductStore> findFirstByProductPrice_IsActiveTrueAndProductCode(String productStoreCode);
     List<ProductStore> findAllByCategory(Category category);
     Page<ProductStore> findAllByProductPrice_IsActiveTrue(Specification<ProductStore> specification, Pageable pageable);
-
-    @Query("SELECT ps FROM ProductStore ps JOIN ps.category c WHERE c.category = :category")
-    Page<ProductStore> findAllProductStoreByCategory(@Param("category") String category, Pageable pageable);
 }

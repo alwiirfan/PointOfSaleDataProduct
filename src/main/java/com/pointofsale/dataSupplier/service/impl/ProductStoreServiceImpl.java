@@ -109,6 +109,19 @@ public class ProductStoreServiceImpl implements ProductStoreService {
                                             "%" + request.getProductName().toLowerCase() + "%"));
             }
 
+            // TODO filter by category
+            if (Objects.nonNull(request.getCategory())){
+                predicates.add(criteriaBuilder
+                            .like(criteriaBuilder.upper(root.join("category").get("category")),
+                                     "%" + request.getCategory().toUpperCase() + "%"));
+            }
+
+            // TODO filter by merk
+            if (Objects.nonNull(request.getMerk())) {
+                predicates.add(criteriaBuilder
+                            .equal(criteriaBuilder.lower(root.get("merk")), request.getMerk().toLowerCase()));
+            }
+
             // TODO filter by min selling price
             if (Objects.nonNull(request.getMinSellingPrice())){
                 predicates.add(criteriaBuilder
@@ -227,21 +240,6 @@ public class ProductStoreServiceImpl implements ProductStoreService {
 
         // TODO delete product store
         productStoreRepository.delete(productStore);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public Page<ProductStoreResponse> getAllProductStoreByCategory(String category, Integer page, Integer size) {
-        // TODO create pageable
-        Pageable pageable = PageRequest.of(page, size);
-
-        // TODO get all product store by category
-        Page<ProductStore> productStores = productStoreRepository.findAllProductStoreByCategory(category.toUpperCase(), pageable);
-
-        // TODO map responses to list
-        List<ProductStoreResponse> responses = productStores.stream().map(this::toProductStoreResponse).collect(Collectors.toList());
-
-        return new PageImpl<>(responses, pageable, productStores.getTotalElements());
     }
 
     @Override

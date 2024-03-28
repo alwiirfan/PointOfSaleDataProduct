@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 public class SearchProductSupplierRequest {
     private String productName;
+    private String category;
+    private String merk;
     private Integer minUnitPrice;
     private Integer maxUnitPrice;
     private Integer totalItem;

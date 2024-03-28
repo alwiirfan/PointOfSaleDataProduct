@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 public class SearchProductStoreRequest {
     private String productCode;
     private String productName;
+    private String Category;
+    private String merk;
     private Integer purchasePrice;
     private Integer minSellingPrice;
     private Integer maxSellingPrice;

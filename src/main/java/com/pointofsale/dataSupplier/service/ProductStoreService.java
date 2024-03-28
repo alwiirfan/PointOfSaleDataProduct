@@ -18,6 +18,4 @@ public interface ProductStoreService {
 
     ProductStore getByProductCode(String productCode);
     ProductStore updateProductStoreStock(Integer stock, String id);
-
-    Page<ProductStoreResponse> getAllProductStoreByCategory(String category, Integer page, Integer size);
 }
