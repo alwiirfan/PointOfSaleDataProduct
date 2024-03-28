@@ -1,6 +1,6 @@
 # Point of Sale
 
-## Point of Sale is an application management system about `Product Store` and `Product Supplier`, this application that has manage of `Products` amd `Sales` feature as the main feature
+## Point of Sale is an application management system about `Product Store` and `Product Supplier`, this application that has manage of `Products` and `Sales` feature as the main feature
 
 ## How to run test
 
