@@ -174,7 +174,8 @@ public class ProductStoreExpirationServiceImpl implements ProductStoreExpiration
                             .productStoreExpirationMerk(productStoreExpirationDetail.getMerk())
                             .productStoreExpirationTotalItem(productStoreExpirationDetail.getTotalItem())
                             .createdAt(productStoreExpirationDetail.getCreatedAt().toString())
-                            .updatedAt(productStoreExpirationDetail.getUpdatedAt() != null ? productStoreExpirationDetail.getUpdatedAt().toString() : null)
+                            .updatedAt(productStoreExpirationDetail.getUpdatedAt() != null ?
+                                     productStoreExpirationDetail.getUpdatedAt().toString() : null)
                             .productStore(productStoreResponse)
                             .build();
                 }).toList();
@@ -184,7 +185,8 @@ public class ProductStoreExpirationServiceImpl implements ProductStoreExpiration
                 .productStoreExpirationId(productStoreExpiration.getId())
                 .category(productStoreExpiration.getCategory().getCategory())
                 .createdAt(productStoreExpiration.getCreatedAt().toString())
-                .updatedAt(productStoreExpiration.getUpdatedAt() != null ? productStoreExpiration.getUpdatedAt().toString() : null)
+                .updatedAt(productStoreExpiration.getUpdatedAt() != null ?
+                         productStoreExpiration.getUpdatedAt().toString() : null)
                 .productStoreExpirationDetails(productStoreExpirationDetailResponses)
                 .build();
     }

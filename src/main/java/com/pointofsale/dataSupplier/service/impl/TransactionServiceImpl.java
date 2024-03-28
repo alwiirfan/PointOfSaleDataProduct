@@ -248,17 +248,23 @@ public class TransactionServiceImpl implements TransactionService {
 
             // TODO filter by transaction type
             if (Objects.nonNull(request.getTransactionType())) {
-                predicateList.add(criteriaBuilder.equal(root.join("transactionType").get("transactionType"), ETransactionType.getTransactionType(request.getTransactionType().toUpperCase())));
+                predicateList.add(criteriaBuilder.equal(root.join("transactionType")
+                        .get("transactionType"), 
+                                ETransactionType.getTransactionType(request.getTransactionType().toUpperCase())));
             }
 
             // TODO filter by product store name
             if (Objects.nonNull(request.getProductName())) {
-                predicateList.add(criteriaBuilder.like(criteriaBuilder.lower(root.join("transactionDetails").join("productStore").get("productName")), "%" + request.getProductName().toLowerCase() + "%"));
+                predicateList.add(criteriaBuilder.like(criteriaBuilder.lower(root.join("transactionDetails")
+                        .join("productStore")
+                                .get("productName")), "%" + request.getProductName().toLowerCase() + "%"));
             }
 
             // TODO filter by product store code
             if (Objects.nonNull(request.getProductCode())) {
-                predicateList.add(criteriaBuilder.like(root.join("transactionDetails").join("productStore").get("productCode"), request.getProductCode()));
+                predicateList.add(criteriaBuilder.like(root.join("transactionDetails")
+                        .join("productStore")
+                                .get("productCode"), request.getProductCode()));
             }
 
             // TODO filter by start date and end date
@@ -307,7 +313,10 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         // TODO calculate total sales
-        BigDecimal cash = transactionRepository.calculateTransactionGroupByTransactionType(ETransactionType.CASH, Objects.nonNull(startDate) ? startDate : LocalDateTime.now(), Objects.nonNull(endDate) ? endDate : LocalDateTime.now());
+        BigDecimal cash = transactionRepository
+                .calculateTransactionGroupByTransactionType(ETransactionType.CASH, Objects.nonNull(startDate) ? 
+                        startDate : LocalDateTime.now(), Objects.nonNull(endDate) ? 
+                                endDate : LocalDateTime.now());
 
         // TODO return total sales
         return TotalSales.builder()
@@ -344,7 +353,8 @@ public class TransactionServiceImpl implements TransactionService {
                     .totalItem(transactionDetail.getTotalItem())
                     .totalPrice(transactionDetail.getTotalPrice())
                     .createdAt(transactionDetail.getCreatedAt().toString())
-                    .updatedAt(transactionDetail.getUpdatedAt() != null ? transactionDetail.getUpdatedAt().toString() : null)
+                    .updatedAt(transactionDetail.getUpdatedAt() != null ? 
+                            transactionDetail.getUpdatedAt().toString() : null)
                     .productStore(productStoreResponse)
                     .build();
         }).toList();
@@ -355,7 +365,8 @@ public class TransactionServiceImpl implements TransactionService {
                 .transactionType(transaction.getTransactionType().getTransactionType().name())
                 .transactionDate(transaction.getTransactionDate().toString())
                 .createdAt(transaction.getCreatedAt().toString())
-                .updatedAt(transaction.getUpdatedAt() != null ? transaction.getUpdatedAt().toString() : null)
+                .updatedAt(transaction.getUpdatedAt() != null ? 
+                        transaction.getUpdatedAt().toString() : null)
                 .transactionDetails(transactionDetailResponses)
                 .build();
     }
