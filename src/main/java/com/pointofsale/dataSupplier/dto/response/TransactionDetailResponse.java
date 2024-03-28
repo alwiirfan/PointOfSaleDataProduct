@@ -18,4 +18,5 @@ public class TransactionDetailResponse {
     private Integer totalItem;
     private BigDecimal totalPrice;
     private String createdAt;
+    private String updatedAt;
 }

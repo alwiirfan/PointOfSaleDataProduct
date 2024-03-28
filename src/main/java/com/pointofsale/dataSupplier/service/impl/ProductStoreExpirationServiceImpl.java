@@ -8,15 +8,20 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import com.pointofsale.dataSupplier.constant.ResponseMessage;
+import com.pointofsale.dataSupplier.dto.request.NewProductStoreExpirationDetailRequest;
 import com.pointofsale.dataSupplier.dto.request.NewProductStoreExpirationRequest;
 import com.pointofsale.dataSupplier.dto.request.SearchProductStoreExpirationRequest;
-import com.pointofsale.dataSupplier.dto.request.UpdateProductStoreExpirationRequest;
+import com.pointofsale.dataSupplier.dto.response.ProductStoreExpirationDetailResponse;
 import com.pointofsale.dataSupplier.dto.response.ProductStoreExpirationResponse;
 import com.pointofsale.dataSupplier.dto.response.ProductStoreResponse;
 import com.pointofsale.dataSupplier.entity.Category;
 import com.pointofsale.dataSupplier.entity.ProductStore;
 import com.pointofsale.dataSupplier.entity.ProductStoreExpiration;
+import com.pointofsale.dataSupplier.entity.ProductStoreExpirationDetail;
 import com.pointofsale.dataSupplier.repository.ProductStoreExpirationRepository;
 import com.pointofsale.dataSupplier.service.CategoryService;
 import com.pointofsale.dataSupplier.service.ProductStoreExpirationService;
@@ -38,59 +43,71 @@ public class ProductStoreExpirationServiceImpl implements ProductStoreExpiration
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public ProductStoreExpirationResponse create(NewProductStoreExpirationRequest request, String productStoreCode) {
+    public ProductStoreExpirationResponse create(NewProductStoreExpirationRequest request) {
         // TODO validate request
         validationUtil.validate(request);
-        try {
+
+        // TODO generate of product store expiration based on request
+        List<ProductStoreExpirationDetail> productStoreExpirationDetails = new ArrayList<>();
+
+        for (NewProductStoreExpirationDetailRequest detailRequest : request.getProductStoreExpirationDetails()) {
+
             // TODO get product store by product store code
-            ProductStore productStore = productStoreService.getByProductCode(productStoreCode);
+            ProductStore productStore = productStoreService.getByProductCode(detailRequest.getProductStoreCode());
 
             if (productStore == null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
                         ResponseMessage.getBadRequest(ProductStore.class));
             }
 
-            // TODO update stock in product store
-            Integer newStock = newStock(productStore, request.getStock());
+            // TODO update product store stock after create product store expiration
+            Integer newStock = newStock(productStore, detailRequest.getProductStoreExpirationTotalItem());
             productStoreService.updateProductStoreStock(newStock, productStore.getId());
-            
-            // TODO validate category
-            String categoryString = request.getCategory();
-            if (categoryString.isEmpty() || categoryString.isBlank()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
-                        ResponseMessage.getBadRequest(Category.class));
-            }
 
-            // TODO get or add return of category
-            Category category = categoryService.getCategoryByCategory(categoryString.toUpperCase());
+            // TODO generate random string
+            String randomString = randomUtil.generateRandomString(6);
 
-            // TODO generate random of product store code
-            String productCode = randomUtil.generateRandomString(6);
-
-            // TODO create product store expiration
-            ProductStoreExpiration productStoreExpiration = ProductStoreExpiration.builder()
-                    .productCode(productCode)
-                    .productName(request.getProductName())
-                    .description(request.getDescription())
-                    .category(category)
-                    .merk(request.getMerk())
-                    .stock(request.getStock())
+            // TODO create product store expiration detail
+            ProductStoreExpirationDetail productStoreExpirationDetail = ProductStoreExpirationDetail.builder()
+                    .productCode(randomString)
+                    .productName(detailRequest.getProductStoreExpirationName())
+                    .description(detailRequest.getProductStoreExpirationDescription())
+                    .merk(detailRequest.getProductStoreExpirationMerk())
+                    .totalItem(detailRequest.getProductStoreExpirationTotalItem())
                     .productStore(productStore)
                     .build();
 
-            productStoreExpiration.setCreatedAt(LocalDateTime.now());
+            productStoreExpirationDetail.setCreatedAt(LocalDateTime.now());
 
-            productStore.setProductStoreExpiration(productStoreExpiration);
-
-            // TODO save and flush
-            productStoreExpirationRepository.saveAndFlush(productStoreExpiration);
-
-            return toCreateProductStoreEpirationResponse(productStoreExpiration);
-        } catch (Exception e) {
-            // TODO throw exception
-            throw new ResponseStatusException(HttpStatus.CONFLICT, 
-                    ResponseMessage.getDuplicateResource(ProductStoreExpiration.class));
+            // TODO add product store expiration detail to list
+            productStoreExpirationDetails.add(productStoreExpirationDetail);
         }
+
+        String categoryString = request.getCategory();
+        if (categoryString.isEmpty() || categoryString.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                    ResponseMessage.getBadRequest(Category.class));
+        }
+
+        // TODO get or add return of category
+        Category category = categoryService.getCategoryByCategory(categoryString.toUpperCase());
+
+        // TODO create product store expiration
+        ProductStoreExpiration productStoreExpiration = ProductStoreExpiration.builder()
+                .category(category)
+                .productStoreExpirationDetails(productStoreExpirationDetails)
+                .build();
+            
+        productStoreExpiration.setCreatedAt(LocalDateTime.now());
+
+        productStoreExpirationRepository.saveAndFlush(productStoreExpiration);
+
+        // TODO add product store expiration to product store expiration details
+        for (ProductStoreExpirationDetail productStoreExpirationDetail : productStoreExpirationDetails) {
+            productStoreExpirationDetail.setProductStoreExpiration(productStoreExpiration);
+        }
+
+        return toProductStoreExpirationResponse(productStoreExpiration);
     }
 
     private Integer newStock(ProductStore productStore, Integer totalItemProductStoreExpiration) {
@@ -114,25 +131,9 @@ public class ProductStoreExpirationServiceImpl implements ProductStoreExpiration
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public ProductStoreExpiration update(UpdateProductStoreExpirationRequest request, String productStoreCode,
-            String productStoreExpirationCode) {
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    @Override
     public void delete(String id) {
         ProductStoreExpiration productStoreExpiration = findByIdOrThrowNotFound(id);
         productStoreExpirationRepository.delete(productStoreExpiration);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public ProductStoreExpiration getByProductStoreExpirationCode(String productStoreExpirationCode) {
-        // TODO get by product store expiration by code
-        return productStoreExpirationRepository.findFirstByProductCode(productStoreExpirationCode).orElseThrow(() -> 
-                new ResponseStatusException(HttpStatus.NOT_FOUND, 
-                        ResponseMessage.getNotFoundResource(ProductStoreExpiration.class)));
     }
 
     private ProductStoreExpiration findByIdOrThrowNotFound(String id) {
@@ -141,32 +142,50 @@ public class ProductStoreExpirationServiceImpl implements ProductStoreExpiration
                         ResponseMessage.getNotFoundResource(ProductStoreExpiration.class)));
     }
 
-    private ProductStoreExpirationResponse toCreateProductStoreEpirationResponse(
+    // TODO create initialize product store expiration response
+    private ProductStoreExpirationResponse toProductStoreExpirationResponse(
             ProductStoreExpiration productStoreExpiration) {
+        // TODO create product store expiration detail response based on product store expiration to list
+        List<ProductStoreExpirationDetailResponse> productStoreExpirationDetailResponses = productStoreExpiration
+                .getProductStoreExpirationDetails().stream().map(productStoreExpirationDetail -> {
+                    
+                    ProductStore productStore = productStoreExpirationDetail.getProductStore();
+
+                    // TODO create product store response
+                    ProductStoreResponse productStoreResponse = ProductStoreResponse.builder()
+                        .productStoreId(productStore.getId())
+                        .productCode(productStore.getProductCode())
+                        .productName(productStore.getProductName())
+                        .productCategory(productStore.getCategory().getCategory())
+                        .productDescription(productStore.getDescription())
+                        .productMerk(productStore.getMerk())
+                        .productPurchasePrice(productStore.getProductPrice().getPurchasePrice())
+                        .productSellingPrice(productStore.getProductPrice().getSellingPrice())
+                        .productStock(productStore.getProductPrice().getStock())
+                        .createdAt(productStore.getCreatedAt().toString())
+                        .updatedAt(productStore.getUpdatedAt() != null ? productStore.getUpdatedAt().toString() : null)
+                        .build();
+
+                    // TODO return product store expiration detail response
+                    return ProductStoreExpirationDetailResponse.builder()
+                            .productStoreExpirationDetailId(productStoreExpirationDetail.getId())
+                            .productStoreExpirationCode(productStoreExpirationDetail.getProductCode())
+                            .productStoreExpirationName(productStoreExpirationDetail.getProductName())
+                            .productStoreExpirationMerk(productStoreExpirationDetail.getMerk())
+                            .productStoreExpirationTotalItem(productStoreExpirationDetail.getTotalItem())
+                            .createdAt(productStoreExpirationDetail.getCreatedAt().toString())
+                            .updatedAt(productStoreExpirationDetail.getUpdatedAt() != null ? productStoreExpirationDetail.getUpdatedAt().toString() : null)
+                            .productStore(productStoreResponse)
+                            .build();
+                }).toList();
+
+        // TODO return product store expiration response
         return ProductStoreExpirationResponse.builder()
                 .productStoreExpirationId(productStoreExpiration.getId())
-                .productCode(productStoreExpiration.getProductCode())
-                .productName(productStoreExpiration.getProductName())
-                .description(productStoreExpiration.getDescription())
                 .category(productStoreExpiration.getCategory().getCategory())
-                .merk(productStoreExpiration.getMerk())
-                .stock(productStoreExpiration.getStock())
-                .productStore(ProductStoreResponse.builder()
-                        .productStoreId(productStoreExpiration.getProductStore().getId())
-                        .productCode(productStoreExpiration.getProductStore().getProductCode())
-                        .productName(productStoreExpiration.getProductStore().getProductName())
-                        .productCategory(productStoreExpiration.getProductStore().getCategory().getCategory())
-                        .productDescription(productStoreExpiration.getProductStore().getDescription())
-                        .productPurchasePrice(productStoreExpiration.getProductStore().getProductPrice().getPurchasePrice())
-                        .productSellingPrice(productStoreExpiration.getProductStore().getProductPrice().getSellingPrice())
-                        .productStock(productStoreExpiration.getProductStore().getProductPrice().getStock())
-                        .productMerk(productStoreExpiration.getProductStore().getMerk())
-                        .createdAt(productStoreExpiration.getProductStore().getCreatedAt().toString())
-                        .updatedAt(productStoreExpiration.getProductStore().getUpdatedAt() != null ? 
-                                productStoreExpiration.getProductStore().getUpdatedAt().toString() : null)
-                        .build())
                 .createdAt(productStoreExpiration.getCreatedAt().toString())
                 .updatedAt(productStoreExpiration.getUpdatedAt() != null ? productStoreExpiration.getUpdatedAt().toString() : null)
+                .productStoreExpirationDetails(productStoreExpirationDetailResponses)
                 .build();
     }
     

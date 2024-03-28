@@ -341,10 +341,11 @@ public class TransactionServiceImpl implements TransactionService {
             return TransactionDetailResponse.builder()
                     .transactionDetailId(transactionDetail.getId())
                     .transactionId(transaction.getId())
-                    .productStore(productStoreResponse)
                     .totalItem(transactionDetail.getTotalItem())
                     .totalPrice(transactionDetail.getTotalPrice())
                     .createdAt(transactionDetail.getCreatedAt().toString())
+                    .updatedAt(transactionDetail.getUpdatedAt() != null ? transactionDetail.getUpdatedAt().toString() : null)
+                    .productStore(productStoreResponse)
                     .build();
         }).toList();
 
