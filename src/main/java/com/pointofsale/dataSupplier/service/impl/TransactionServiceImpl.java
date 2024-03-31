@@ -41,6 +41,7 @@ import com.pointofsale.dataSupplier.service.ProductStoreService;
 import com.pointofsale.dataSupplier.service.TransactionService;
 import com.pointofsale.dataSupplier.service.TransactionTypeService;
 import com.pointofsale.dataSupplier.util.POSUtil;
+import com.pointofsale.dataSupplier.util.RandomUtil;
 import com.pointofsale.dataSupplier.util.ValidationUtil;
 
 import jakarta.persistence.criteria.Predicate;
@@ -53,6 +54,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final ProductStoreService productStoreService;
     private final TransactionTypeService transactionTypeService;
     private final ValidationUtil validationUtil;
+    private final RandomUtil randomUtil;
     
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -62,6 +64,9 @@ public class TransactionServiceImpl implements TransactionService {
 
         // TODO generate of transaction detail based on request 
         List<TransactionDetail> transactionDetails = new ArrayList<>();
+
+        // TODO initialize total price transaction
+        BigDecimal totalPriceTransaction = BigDecimal.ZERO;
 
         for (NewTransactionDetailRequest detailRequest : request.getTransactionDetails()) {
             // TODO get product store by product store code
@@ -89,6 +94,9 @@ public class TransactionServiceImpl implements TransactionService {
             transactionDetail.setCreatedAt(LocalDateTime.now());
 
             transactionDetails.add(transactionDetail);
+
+            // TODO add total price to total price transaction
+            totalPriceTransaction = totalPriceTransaction.add(totalPrice);
         }
 
         // TODO create transaction type based on transaction type
@@ -97,10 +105,23 @@ public class TransactionServiceImpl implements TransactionService {
 
         transactionType.setCreatedAt(LocalDateTime.now());
 
+        // TODO logic for payment and back
+        BigDecimal payment = request.getPayment();
+        BigDecimal back = payment.subtract(totalPriceTransaction);
+        if (back.compareTo(BigDecimal.ZERO) < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payment not enough");
+        }
+
+        String noStruk = randomUtil.generateRandomNumber();
+
         // TODO create transaction and add to transaction details
         Transaction transaction = Transaction.builder()
                 .transactionType(transactionType)
                 .transactionDate(LocalDateTime.now())
+                .noStruk(noStruk)
+                .payment(payment)
+                .back(back)
+                .totalPrice(totalPriceTransaction)
                 .transactionDetails(transactionDetails)
                 .build();
 
@@ -171,6 +192,9 @@ public class TransactionServiceImpl implements TransactionService {
         // TODO get transaction details
         List<TransactionDetail> transactionDetails = transaction.getTransactionDetails();
 
+        // TODO initialize total price transaction
+        BigDecimal totalPriceTransaction = BigDecimal.ZERO;
+
         // TODO update transaction details using foreach
             for (TransactionDetail transactionDetail : transactionDetails) {
                 String transactionDetailId = transactionDetail.getId();
@@ -198,6 +222,8 @@ public class TransactionServiceImpl implements TransactionService {
                     transactionDetail.setTotalItem(detailRequest.getNewTotalItem());
                     transactionDetail.setTotalPrice(newTotalPrice);
                     transactionDetail.setUpdatedAt(LocalDateTime.now());
+
+                    totalPriceTransaction = totalPriceTransaction.add(newTotalPrice);
                 }
             }
 
@@ -206,9 +232,19 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionType transactionType = transactionTypeService.getOrSave(eType);
         transactionType.setCreatedAt(LocalDateTime.now());
 
+        // TODO logic for payment and back
+        BigDecimal payment = request.getPayment();
+        BigDecimal back = payment.subtract(totalPriceTransaction);
+        if (back.compareTo(BigDecimal.ZERO) < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payment not enough");
+        }
+
         // TODO create transaction and add to transaction details
         transaction.setTransactionType(transactionType);
+        transaction.setPayment(payment);
+        transaction.setBack(back);
         transaction.setTransactionDate(LocalDateTime.now());
+        transaction.setTotalPrice(totalPriceTransaction);
         transaction.setTransactionDetails(transactionDetails);
         transaction.setUpdatedAt(LocalDateTime.now());
 
@@ -363,7 +399,11 @@ public class TransactionServiceImpl implements TransactionService {
         return TransactionResponse.builder()
                 .transactionId(transaction.getId())
                 .transactionType(transaction.getTransactionType().getTransactionType().name())
+                .noStruk(transaction.getNoStruk())
                 .transactionDate(transaction.getTransactionDate().toString())
+                .payment(transaction.getPayment())
+                .back(transaction.getBack())
+                .totalPrice(transaction.getTotalPrice())
                 .createdAt(transaction.getCreatedAt().toString())
                 .updatedAt(transaction.getUpdatedAt() != null ? 
                         transaction.getUpdatedAt().toString() : null)

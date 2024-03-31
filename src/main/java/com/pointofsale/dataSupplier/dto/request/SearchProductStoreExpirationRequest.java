@@ -10,10 +10,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class SearchProductStoreExpirationRequest {
-    private String productCode;
-    private String productName;
-    private String description;
     private String category;
-    private String merk;
-    private Integer stock;
+    private String productExpirationDetailCode;
+    private String productExpirationDetailName;
+    private String productExpirationDetailMerk;
+    private Integer productExpirationDetailMinTotalItem;
+    private Integer productExpirationDetailMaxTotalItem;
+    private String startDate;
+    private String endDate;
 }

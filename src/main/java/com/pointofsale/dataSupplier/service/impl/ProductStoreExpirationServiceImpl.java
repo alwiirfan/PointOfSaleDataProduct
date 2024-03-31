@@ -1,6 +1,10 @@
 package com.pointofsale.dataSupplier.service.impl;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +14,7 @@ import java.time.LocalDateTime;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import com.pointofsale.dataSupplier.constant.ResponseMessage;
 import com.pointofsale.dataSupplier.dto.request.NewProductStoreExpirationDetailRequest;
@@ -26,9 +31,11 @@ import com.pointofsale.dataSupplier.repository.ProductStoreExpirationRepository;
 import com.pointofsale.dataSupplier.service.CategoryService;
 import com.pointofsale.dataSupplier.service.ProductStoreExpirationService;
 import com.pointofsale.dataSupplier.service.ProductStoreService;
+import com.pointofsale.dataSupplier.util.POSUtil;
 import com.pointofsale.dataSupplier.util.RandomUtil;
 import com.pointofsale.dataSupplier.util.ValidationUtil;
 
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -123,19 +130,81 @@ public class ProductStoreExpirationServiceImpl implements ProductStoreExpiration
 
     @Transactional(readOnly = true)
     @Override
+    public ProductStoreExpirationResponse getById(String id) {
+        // TODO get product store expiration by id
+        ProductStoreExpiration productStoreExpiration = findByIdOrThrowNotFound(id);
+        return toProductStoreExpirationResponse(productStoreExpiration);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
     public Page<ProductStoreExpirationResponse> getAll(SearchProductStoreExpirationRequest request, Integer page,
             Integer size) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAll'");
+        Specification<ProductStoreExpiration> specification = (root, query, criteriaBuilder) -> {
+            List<Predicate> predicateList = new ArrayList<>();
+
+            if (Objects.nonNull(request.getCategory())) {
+                predicateList.add(criteriaBuilder.like(criteriaBuilder.upper(
+                        root.join("category").get("category")), 
+                                "%" + request.getCategory().toUpperCase() + "%"));
+            }
+
+            if (Objects.nonNull(request.getProductExpirationDetailCode())) {
+                predicateList.add(criteriaBuilder.equal(root
+                        .join("productStoreExpirationDetails")
+                                .get("productCode"), request.getProductExpirationDetailCode()));
+            }
+
+            if (Objects.nonNull(request.getProductExpirationDetailName())) {
+                predicateList.add(criteriaBuilder.like(criteriaBuilder.lower(root
+                        .join("productStoreExpirationDetails").get("productName")), 
+                                "%" + request.getProductExpirationDetailName().toLowerCase() + "%"));
+            }
+
+            if (Objects.nonNull(request.getProductExpirationDetailMerk())) {
+                predicateList.add(criteriaBuilder.equal(criteriaBuilder.lower(root
+                        .join("productStoreExpirationDetails").get("merk")), 
+                                request.getProductExpirationDetailMerk().toLowerCase()));
+            }
+
+            if (Objects.nonNull(request.getProductExpirationDetailMinTotalItem())) {
+                predicateList.add(criteriaBuilder.greaterThanOrEqualTo(root
+                        .join("productStoreExpirationDetails").get("totalItem"), 
+                                request.getProductExpirationDetailMinTotalItem()));
+            }
+
+            if (Objects.nonNull(request.getProductExpirationDetailMaxTotalItem())) {
+                predicateList.add(criteriaBuilder.lessThanOrEqualTo(root
+                        .join("productStoreExpirationDetails").get("totalItem"), 
+                                request.getProductExpirationDetailMaxTotalItem()));
+            }
+
+            if (Objects.nonNull(request.getStartDate()) && Objects.nonNull(request.getEndDate())) {
+                LocalDateTime startDate = POSUtil.parseLocalDateTime(request.getStartDate());
+                LocalDateTime endDate = POSUtil.parseLocalDateTime(request.getEndDate());
+                predicateList.add(criteriaBuilder.between(root.get("createdAt"), startDate, endDate));
+            }
+
+            if (Objects.nonNull(request.getStartDate()) && Objects.isNull(request.getEndDate())) {
+                LocalDateTime startDate = POSUtil.parseLocalDateTime(request.getStartDate());
+                predicateList.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startDate));
+            }
+
+            return query.where(predicateList.toArray(new Predicate[]{})).getRestriction();
+        };
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<ProductStoreExpiration> productStoreExpirationPage = productStoreExpirationRepository.findAll(specification, pageable);
+
+        List<ProductStoreExpirationResponse> productStoreExpirationResponses = productStoreExpirationPage.stream()
+                .map(this::toProductStoreExpirationResponse).toList();
+
+        return new PageImpl<>(productStoreExpirationResponses, pageable, productStoreExpirationPage.getTotalElements());
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    @Override
-    public void delete(String id) {
-        ProductStoreExpiration productStoreExpiration = findByIdOrThrowNotFound(id);
-        productStoreExpirationRepository.delete(productStoreExpiration);
-    }
 
+    // TODO find by id return product store expiration or throw not found
     private ProductStoreExpiration findByIdOrThrowNotFound(String id) {
         return productStoreExpirationRepository.findById(id).orElseThrow(() -> 
                 new ResponseStatusException(HttpStatus.NOT_FOUND, 
@@ -171,6 +240,7 @@ public class ProductStoreExpirationServiceImpl implements ProductStoreExpiration
                             .productStoreExpirationDetailId(productStoreExpirationDetail.getId())
                             .productStoreExpirationCode(productStoreExpirationDetail.getProductCode())
                             .productStoreExpirationName(productStoreExpirationDetail.getProductName())
+                            .productStoreExpirationDescription(productStoreExpirationDetail.getDescription())
                             .productStoreExpirationMerk(productStoreExpirationDetail.getMerk())
                             .productStoreExpirationTotalItem(productStoreExpirationDetail.getTotalItem())
                             .createdAt(productStoreExpirationDetail.getCreatedAt().toString())

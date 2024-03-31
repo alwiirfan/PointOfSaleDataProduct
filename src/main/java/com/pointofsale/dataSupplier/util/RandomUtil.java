@@ -2,6 +2,8 @@ package com.pointofsale.dataSupplier.util;
 
 import org.springframework.stereotype.Component;
 
+import java.util.Random;
+
 @Component
 public class RandomUtil {
     
@@ -26,5 +28,19 @@ public class RandomUtil {
         }
 
         return sb.toString();
+    }
+
+    public String generateRandomNumber() {
+       Random random = new Random();
+
+       Integer trx1 = random.nextInt(100);
+       Integer trx2 = random.nextInt(100);
+       Integer trx3 = random.nextInt(10000);
+       Integer trx4 = random.nextInt(10000);
+       Integer trx5 = random.nextInt(100);
+       Integer trx6 = random.nextInt(100);
+
+       String trxNumString = String.format("TRX-%02d.%02d.%04d.%04d.%02d.%02d", trx1, trx2, trx3, trx4, trx5, trx6);
+       return trxNumString;
     }
 }

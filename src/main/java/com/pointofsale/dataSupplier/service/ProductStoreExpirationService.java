@@ -8,6 +8,6 @@ import com.pointofsale.dataSupplier.dto.response.ProductStoreExpirationResponse;
 
 public interface ProductStoreExpirationService {
     ProductStoreExpirationResponse create(NewProductStoreExpirationRequest request);
+    ProductStoreExpirationResponse getById(String id);
     Page<ProductStoreExpirationResponse> getAll(SearchProductStoreExpirationRequest request, Integer page, Integer size);
-    void delete(String id);
 }
