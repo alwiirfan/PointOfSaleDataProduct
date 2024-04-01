@@ -9,7 +9,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.pointofsale.dataSupplier.constant.ECategory;
+// import com.pointofsale.dataSupplier.constant.ECategory;
 import com.pointofsale.dataSupplier.entity.Category;
 import com.pointofsale.dataSupplier.repository.CategoryRepository;
 import com.pointofsale.dataSupplier.service.CategoryService;
@@ -24,7 +24,7 @@ public class CategoryServiceImplTests {
     @Test
     void getCategoryOrSave_CategoryExists() {
         // Arrange
-        ECategory eCategory = ECategory.MAKANAN;
+        // ECategory eCategory = ECategory.MAKANAN;
         // Category existingCategory = Category.builder().category(eCategory).build();
 
         // mock repos behavior
@@ -44,7 +44,7 @@ public class CategoryServiceImplTests {
     @Test
     void getCategoryOrSave_CategoryNotExists() {
         // Arrange
-        ECategory eCategory = ECategory.MINUMAN;
+        // ECategory eCategory = ECategory.MINUMAN;
         // Category newCategory = Category.builder().category(eCategory).build();
 
         // mock repos behavior

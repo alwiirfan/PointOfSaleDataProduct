@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.*;
 
-import com.pointofsale.dataSupplier.constant.ECategory;
+// import com.pointofsale.dataSupplier.constant.ECategory;
 import com.pointofsale.dataSupplier.entity.Category;
 import com.pointofsale.dataSupplier.entity.ProductStore;
 

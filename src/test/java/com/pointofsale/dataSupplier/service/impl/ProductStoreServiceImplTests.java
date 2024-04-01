@@ -49,7 +49,7 @@ public class ProductStoreServiceImplTests {
 
         // dummy category
         String dummyCategory = dummyRequest.getProductCategory();
-        ECategory eCategory = ECategory.getCategory(dummyCategory);
+        // ECategory eCategory = ECategory.getCategory(dummyCategory);
         // Category category = Category.builder().category(eCategory).build();
 
         // dummy product price
@@ -265,7 +265,7 @@ public class ProductStoreServiceImplTests {
 
             // dummy category
             String dummyCategory = dummyRequest.getProductCategory();
-            ECategory eCategory = ECategory.getCategory(dummyCategory);
+            // ECategory eCategory = ECategory.getCategory(dummyCategory);
             // Category category = Category.builder().category(eCategory).build();
 
             // dummy product store
@@ -330,7 +330,7 @@ public class ProductStoreServiceImplTests {
 
             // dummy category
             String dummyCategory = dummyRequest.getProductCategory();
-            ECategory eCategory = ECategory.getCategory(dummyCategory);
+            // ECategory eCategory = ECategory.getCategory(dummyCategory);
             // Category category = Category.builder().category(eCategory).build();
 
             // dummy product store

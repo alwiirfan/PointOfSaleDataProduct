@@ -19,3 +19,9 @@ spring:
   activemq:
     pool:
       idle-timeout: 20000
+
+pos:
+  app:
+    jwt:
+      secret: ${JWT_SECRET}
+      expirationMs: ${JWT_EXPIRATIONMS}
