@@ -2,6 +2,7 @@ package com.pointofsale.dataSupplier.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -29,6 +30,15 @@ public class SecurityConfiguration {
     private final AuthTokenFilter authTokenFilter;
     private final CustomAccessDeniedHandler CustomAccessDeniedHandler;
 
+    private static final String[] SUPER_ADMIN_URLS = {
+        "/api/v1/auth/register/super-admin",
+        "/api/v1/auth/register/admin"
+    };
+
+    private static final String[] ADMIN_WITH_METHOD_POST_URLS = {
+        "/api/v1/auth/register/cashier"
+    };
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -52,7 +62,9 @@ public class SecurityConfiguration {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 . authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/v1/auth/**").permitAll()
+                        .requestMatchers(SUPER_ADMIN_URLS).hasRole("SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.POST, ADMIN_WITH_METHOD_POST_URLS).hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class)

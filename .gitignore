@@ -37,6 +37,7 @@ postman.http
 
 ### environment variable
 .env
+env.sh
 
 ### Makefile (command runtime execute)
 Makefile
